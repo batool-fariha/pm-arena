@@ -327,6 +327,8 @@ button.tlink{background:none;border:0;cursor:pointer}
 .sum{font-weight:500}
 .btn.big{padding:15px 30px;font-size:1.05rem}
 
+/* shared board */
+.note2{color:var(--mute);font-size:.9rem;margin-top:6px}
 /* fun layer */
 .btn.primary:hover{box-shadow:0 0 0 4px rgba(53,224,165,.4),0 14px 34px -12px rgba(13,14,18,.6)}
 .btn.accent:hover{box-shadow:0 0 0 4px rgba(53,224,165,.45),0 14px 34px -12px rgba(36,87,255,.7)}
@@ -414,7 +416,7 @@ tr.top1 td.n i{color:var(--mint-ink);font-size:1.2rem;vertical-align:-3px}
   const dayDiff = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 864e5);
   const liveStreak = () => store.lastDay && dayDiff(today(), store.lastDay) <= 1 ? store.streak : 0;
 
-  let state = { bump: false, c: null, end: 0, timer: null, answer: '', res: null, board: 'all', entry: null };
+  let state = { scope: 'global', posted: null, bump: false, c: null, end: 0, timer: null, answer: '', res: null, board: 'all', entry: null };
 
   const TICON = { retention: 'trend-down', conversion: 'funnel', buildvsbuy: 'scales', launch: 'rocket-launch', prioritize: 'list-numbers', design: 'pencil-ruler' };
   const ICON = { framing: 'crosshair', clarify: 'chat-circle-dots', segmentation: 'chart-pie-slice', hypothesis: 'flask', metrics: 'gauge', prioritization: 'list-numbers', communication: 'megaphone-simple' };
@@ -424,7 +426,7 @@ tr.top1 td.n i{color:var(--mint-ink);font-size:1.2rem;vertical-align:-3px}
   function footerHtml() {
     return `<footer class="foot"><div class="top"><div><span class="nm">${LOGO(26)}PM Arena</span>
       <p>Designed and built by <a class="u" href="${SITE.linkedin}" target="_blank" rel="noopener noreferrer">${SITE.author}</a>.</p>
-      <p>Free, no account. Your answers stay in your browser.</p></div>
+      <p>Free, no account. Your answers stay in your browser unless you post a score.</p></div>
       <nav class="soc" aria-label="Author links"><a href="${SITE.github}" target="_blank" rel="noopener noreferrer" aria-label="${SITE.author} on GitHub" title="GitHub"><i class="ph ph-github-logo"></i></a><a href="${SITE.linkedin}" target="_blank" rel="noopener noreferrer" aria-label="${SITE.author} on LinkedIn" title="LinkedIn"><i class="ph ph-linkedin-logo"></i></a><a href="${SITE.repo}" target="_blank" rel="noopener noreferrer" aria-label="PM Arena source code" title="Source code"><i class="ph ph-code"></i></a></nav></div>
       <p class="fine">${DISCLAIMER}</p></footer>`;
   }
@@ -555,8 +557,8 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       </section>
 
       <section class="sec" id="lb-sec">
-        <div class="row" style="justify-content:space-between;align-items:end"><div><h2>Leaderboard</h2><p class="lead" style="margin-top:8px">Best ${best || 0} out of 100 across ${store.played} scored ${store.played===1?'case':'cases'}. Stored on this device only.</p></div>
-          <div class="seg" role="group" aria-label="Leaderboard range"><button data-b="all" aria-pressed="${state.board==='all'}">All time</button><button data-b="week" aria-pressed="${state.board==='week'}">7 days</button></div></div>
+        <div class="row" style="justify-content:space-between;align-items:end"><div><h2>Leaderboard</h2><p class="lead" style="margin-top:8px">Your best: ${best || 0} out of 100 across ${store.played} scored ${store.played===1?'case':'cases'}. Post a score after a round to join the shared board.</p></div>
+          ${boardCtl()}</div>
         <div id="lb" style="margin-top:20px">${boardHtml(state.entry)}</div>
       </section>
       ${footerHtml()}
@@ -768,6 +770,9 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
               <p><b>${w.score} out of 100, weight ${w.weight}.</b> ${w.missing.length ? esc(w.missing[0].replace(/[.:?]?$/, '.')) + ' ' : ''}${esc(w.fix)}</p></div>
             <div class="share"><h3>Share your result</h3><div class="pre" id="sh">${esc(shareText())}</div>
               <div class="row" style="margin-top:14px"><button class="btn primary" id="copy"><i class="ph ph-copy"></i>Copy text</button><button class="btn ghost" id="nat"><i class="ph ph-share-network"></i>Share</button><button class="btn ghost" id="png"><i class="ph ph-download-simple"></i>Download image</button><span id="msg" role="status" style="color:#14744a"></span></div></div>
+            ${r.counts ? `<div class="share"><h3>Join the shared leaderboard</h3><p class="note2">Posting sends your name and answer text to the server once, so it can re-score your answer and block made-up scores. The answer is not stored.</p>
+              <div class="row" style="margin-top:14px"><input type="text" id="pnick" maxlength="20" placeholder="Anonymous" aria-label="Name for the leaderboard" value="${esc(store.nick)}" style="flex:1 1 180px;width:auto"><button class="btn lime" id="post"><i class="ph ph-trophy"></i>Post my score</button></div>
+              <p id="pmsg" role="status" class="note2" style="margin-top:12px"></p></div>` : ''}
           </div>
         </div>
       </section>
@@ -776,31 +781,74 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
         <div class="dims">${dimHtml}</div>
       </section>
       <section class="sec" id="lb-sec"><div class="row" style="justify-content:space-between;align-items:end"><h2>Leaderboard</h2>
-        <div class="seg" role="group" aria-label="Leaderboard range"><button data-b="all" aria-pressed="${state.board==='all'}">All time</button><button data-b="week" aria-pressed="${state.board==='week'}">7 days</button></div></div>
+        ${boardCtl()}</div>
         <div id="lb" style="margin-top:20px">${boardHtml(state.entry)}</div></section>
       ${footerHtml()}</div>`;
     const msg = t => { document.getElementById('msg').textContent = t; };
     document.getElementById('copy').onclick = () => navigator.clipboard.writeText(shareText()).then(() => msg('Copied'), () => msg('Copy failed, select the text manually'));
     const nat = document.getElementById('nat'); if (!navigator.share) nat.hidden = true; else nat.onclick = () => navigator.share({ text: shareText() }).catch(() => {});
     document.getElementById('png').onclick = downloadCard;
+    const pb = document.getElementById('post');
+    if (pb) pb.onclick = async () => {
+      const pm = document.getElementById('pmsg'), nick = document.getElementById('pnick').value.trim(), c = state.c;
+      pb.disabled = true; pm.textContent = 'Posting...';
+      try {
+        const rr = await fetch('/api/scores', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nick, answer: state.answer, case: { type: c.type, title: c.title, prompt: c.prompt, list: c.list } }) });
+        const j = await rr.json().catch(() => ({}));
+        if (rr.ok && j.ok) {
+          if (nick) { store.nick = nick; save(); }
+          state.posted = j; state.scope = 'global'; pm.textContent = `Posted as ${j.nick}. You are #${j.rank} on the shared board.`; pb.hidden = true;
+          document.querySelectorAll('[data-s]').forEach(x => x.setAttribute('aria-pressed', x.dataset.s === 'global'));
+          loadGlobal();
+        } else {
+          pb.disabled = false;
+          pm.textContent = rr.status === 429 ? 'Please wait a few seconds before posting again.' : rr.status === 400 ? 'That answer could not be verified, so it was not posted.' : 'Could not post right now. Try again in a moment.';
+        }
+      } catch (e) { pb.disabled = false; pm.textContent = 'Could not reach the server. Check your connection and try again.'; }
+    };
     document.getElementById('next').onclick = () => start(A.generateCase(store.type));
     document.getElementById('retry').onclick = () => start(state.c);
     wireBoard(); countUp(); window.scrollTo(0, 0); if (r.overall >= 75) burst(); state.bump = false;
   }
 
   /* ---------- leaderboard ---------- */
+  let globalBoard = null;
+  function boardCtl() {
+    return `<div class="row" style="gap:8px"><div class="seg" role="group" aria-label="Leaderboard scope"><button data-s="global" aria-pressed="${state.scope==='global'}">Global</button><button data-s="device" aria-pressed="${state.scope==='device'}">This device</button></div>
+      <div class="seg" role="group" aria-label="Leaderboard range"><button data-b="all" aria-pressed="${state.board==='all'}">All time</button><button data-b="week" aria-pressed="${state.board==='week'}">7 days</button></div></div>`;
+  }
+  function table(rows, isMe) {
+    return `<table><tr><th>Rank</th><th>Name</th><th>Case</th><th>Score</th></tr>${rows.map((e, i) => `<tr class="${isMe(e) ? 'me' : ''} ${i === 0 ? 'top1' : ''}"><td class="n">${i === 0 ? '<i class="ph-fill ph-trophy"></i> ' : ''}${i + 1}</td><td>${esc(e.nick)}</td><td>${esc(e.type)}</td><td class="n">${e.score}</td></tr>`).join('')}</table>`;
+  }
   function boardHtml(me) {
-    const cut = Date.now() - 7 * 864e5;
-    const rows = store.board.filter(e => state.board === 'all' || e.ts > cut).slice(0, 10);
-    if (!rows.length) return '<p class="lead">No scored attempts yet. Answers under 30 words do not count.</p>';
-    return `<table><tr><th>Rank</th><th>Name</th><th>Case</th><th>Score</th></tr>${rows.map((e, i) => `<tr class="${me && e === me ? 'me' : ''} ${i === 0 ? 'top1' : ''}"><td class="n">${i === 0 ? '<i class="ph-fill ph-trophy"></i> ' : ''}${i + 1}</td><td>${esc(e.nick)}</td><td>${esc(e.type)}</td><td class="n">${e.score}</td></tr>`).join('')}</table>`;
+    const cut = Date.now() - 7 * 864e5, wk = state.board === 'week';
+    if (state.scope === 'global') {
+      if (!globalBoard || globalBoard === 'loading') return '<p class="lead">Loading the shared board...</p>';
+      if (globalBoard === 'error') return '<p class="lead">The shared board is not reachable right now. Switch to "This device" to see your own scores.</p>';
+      const rows = (wk ? globalBoard.week : globalBoard.all).slice(0, 10);
+      if (!rows.length) return '<p class="lead">No one has posted yet. Finish a round and post your score to take the first spot.</p>';
+      const p = state.posted;
+      return table(rows, e => p && e.ts === p.ts && e.nick === p.nick);
+    }
+    const rows = store.board.filter(e => !wk || e.ts > cut).slice(0, 10);
+    if (!rows.length) return '<p class="lead">No scored attempts on this device yet. Answers under 30 words do not count.</p>';
+    return table(rows, e => me && e === me);
+  }
+  function refreshBoard() { const lb = document.getElementById('lb'); if (lb) lb.innerHTML = boardHtml(state.entry); }
+  async function loadGlobal() {
+    globalBoard = 'loading'; refreshBoard();
+    try { const r = await fetch('/api/scores', { cache: 'no-store' }); if (!r.ok) throw new Error('bad status'); globalBoard = await r.json(); } catch (e) { globalBoard = 'error'; }
+    refreshBoard();
   }
   function wireBoard() {
-    document.querySelectorAll('[data-b]').forEach(b => b.onclick = () => {
-      state.board = b.dataset.b;
+    const sync = () => {
       document.querySelectorAll('[data-b]').forEach(x => x.setAttribute('aria-pressed', x.dataset.b === state.board));
-      document.getElementById('lb').innerHTML = boardHtml(state.entry);
-    });
+      document.querySelectorAll('[data-s]').forEach(x => x.setAttribute('aria-pressed', x.dataset.s === state.scope));
+      refreshBoard();
+    };
+    document.querySelectorAll('[data-b]').forEach(b => b.onclick = () => { state.board = b.dataset.b; sync(); });
+    document.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { state.scope = b.dataset.s; sync(); });
+    loadGlobal();
   }
 
   /* ---------- share image ---------- */

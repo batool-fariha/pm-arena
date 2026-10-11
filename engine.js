@@ -233,12 +233,9 @@
     },
   };
 
-  function generateCase(typeId) {
-    const id = typeId && GEN[typeId] ? typeId : pick(TYPES).id;
-    const c = GEN[id]();
-    c.id = id + '-' + Math.random().toString(36).slice(2, 8);
-    const tok = (str) => (String(str).toLowerCase().match(/[a-z]{5,}/g) || []).join('|');
-    c.topic = {
+  const tok = (str) => (String(str).toLowerCase().match(/[a-z]{5,}/g) || []).join('|');
+  function topicFor(id, c) {
+    return {
       retention: 'retention|d30|day-?30|churn',
       conversion: 'conversion|convert|trial|checkout|paywall|upgrade',
       buildvsbuy: 'vendor|in-house|\\bbuy\\b|build (vs|or)|total cost|licen[cs]e',
@@ -246,6 +243,13 @@
       prioritize: (c.list || []).map((f) => tok(f.name)).filter(Boolean).join('|') + '|engineering-weeks|capacity|roadmap',
       design: tok(c.prompt.split('. ')[0].replace('Design a product for ', '')),
     }[id];
+  }
+
+  function generateCase(typeId) {
+    const id = typeId && GEN[typeId] ? typeId : pick(TYPES).id;
+    const c = GEN[id]();
+    c.id = id + '-' + Math.random().toString(36).slice(2, 8);
+    c.topic = topicFor(id, c);
     c.label = TYPES.find((t) => t.id === id).label;
     return c;
   }
@@ -428,6 +432,26 @@
     return { overall, dims, weakest, words: wc, flags, counts: wc >= 30 };
   }
 
+
+  /* Per-type constants, derived from the generators so they cannot drift. */
+  const META = {};
+  TYPES.forEach((t) => { const c = GEN[t.id](); META[t.id] = { diagnostic: c.diagnostic, drivers: c.drivers, clarify: c.clarify }; });
+
+  /* Rebuild a full case from untrusted basic fields (used by the server). */
+  function rebuildCase(inp) {
+    if (!inp || typeof inp !== 'object' || !META[inp.type]) return null;
+    const c = Object.assign({}, META[inp.type], {
+      type: inp.type,
+      title: String(inp.title || '').slice(0, 120),
+      prompt: String(inp.prompt || '').slice(0, 700),
+      list: Array.isArray(inp.list) ? inp.list.slice(0, 5).map((f) => ({ name: String((f && f.name) || '').slice(0, 60) })) : undefined,
+      sample: {},
+    });
+    c.label = TYPES.find((t) => t.id === c.type).label;
+    c.topic = topicFor(c.type, c);
+    return c;
+  }
+
   function band(n) {
     if (n >= 90) return 'Very strong signals';
     if (n >= 75) return 'Strong structure';
@@ -436,7 +460,7 @@
     return 'Early draft';
   }
 
-  const api = { TYPES, CLARIFY, generateCase, scoreAnswer, band, DIMS };
+  const api = { TYPES, CLARIFY, generateCase, scoreAnswer, band, DIMS, rebuildCase };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Arena = api;
 })(typeof window !== 'undefined' ? window : globalThis);

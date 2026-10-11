@@ -1,0 +1,10 @@
+{
+  "name": "pm-arena",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Practice PM interview cases on the clock. Heuristic critique, not a hiring assessment.",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/blob": "^2.0.0"
+  }
+}
