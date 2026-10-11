@@ -799,7 +799,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
           if (nick) { store.nick = nick; save(); }
           state.posted = j; state.scope = 'global'; pm.textContent = `Posted as ${j.nick}. You are #${j.rank} on the shared board.`; pb.hidden = true;
           document.querySelectorAll('[data-s]').forEach(x => x.setAttribute('aria-pressed', x.dataset.s === 'global'));
-          loadGlobal();
+          loadGlobal(true);
         } else {
           pb.disabled = false;
           pm.textContent = rr.status === 429 ? 'Please wait a few seconds before posting again.' : rr.status === 400 ? 'That answer could not be verified, so it was not posted.' : 'Could not post right now. Try again in a moment.';
@@ -835,9 +835,9 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
     return table(rows, e => me && e === me);
   }
   function refreshBoard() { const lb = document.getElementById('lb'); if (lb) lb.innerHTML = boardHtml(state.entry); }
-  async function loadGlobal() {
+  async function loadGlobal(fresh) {
     globalBoard = 'loading'; refreshBoard();
-    try { const r = await fetch('/api/scores', { cache: 'no-store' }); if (!r.ok) throw new Error('bad status'); globalBoard = await r.json(); } catch (e) { globalBoard = 'error'; }
+    try { const r = await fetch('/api/scores' + (fresh ? '?t=' + Date.now() : ''), { cache: 'no-store' }); if (!r.ok) throw new Error('bad status'); globalBoard = await r.json(); } catch (e) { globalBoard = 'error'; }
     refreshBoard();
   }
   function wireBoard() {
