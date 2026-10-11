@@ -410,12 +410,12 @@ tr.top1 td.n i{color:var(--mint-ink);font-size:1.2rem;vertical-align:-3px}
   const ICON = { framing: 'crosshair', clarify: 'chat-circle-dots', segmentation: 'chart-pie-slice', hypothesis: 'flask', metrics: 'gauge', prioritization: 'list-numbers', communication: 'megaphone-simple' };
 
   const LOGO = (n) => `<svg width="${n}" height="${n}" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#0d0e12"/><rect x="5" y="9" width="22" height="14" rx="7" fill="none" stroke="#fff" stroke-width="2"/><rect x="10" y="13" width="12" height="6" rx="3" fill="#35e0a5"/></svg>`;
-  const SITE = { author: 'Fariha Batool', github: 'https://github.com/batool-fariha/', linkedin: 'https://www.linkedin.com/in/fariha-batool/' };
+  const SITE = { author: 'Fariha Batool', github: 'https://github.com/batool-fariha/', linkedin: 'https://www.linkedin.com/in/fariha-batool/', repo: 'https://github.com/batool-fariha/pm-arena' };
   function footerHtml() {
     return `<footer class="foot"><div class="top"><div><span class="nm">${LOGO(26)}PM Arena</span>
       <p>Designed and built by <a class="u" href="${SITE.linkedin}" target="_blank" rel="noopener noreferrer">${SITE.author}</a>.</p>
       <p>Free, no account. Your answers stay in your browser.</p></div>
-      <nav class="soc" aria-label="Author links"><a href="${SITE.github}" target="_blank" rel="noopener noreferrer" aria-label="${SITE.author} on GitHub" title="GitHub"><i class="ph ph-github-logo"></i></a><a href="${SITE.linkedin}" target="_blank" rel="noopener noreferrer" aria-label="${SITE.author} on LinkedIn" title="LinkedIn"><i class="ph ph-linkedin-logo"></i></a></nav></div>
+      <nav class="soc" aria-label="Author links"><a href="${SITE.github}" target="_blank" rel="noopener noreferrer" aria-label="${SITE.author} on GitHub" title="GitHub"><i class="ph ph-github-logo"></i></a><a href="${SITE.linkedin}" target="_blank" rel="noopener noreferrer" aria-label="${SITE.author} on LinkedIn" title="LinkedIn"><i class="ph ph-linkedin-logo"></i></a><a href="${SITE.repo}" target="_blank" rel="noopener noreferrer" aria-label="PM Arena source code" title="Source code"><i class="ph ph-code"></i></a></nav></div>
       <p class="fine">${DISCLAIMER}</p></footer>`;
   }
 
