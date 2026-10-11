@@ -4,7 +4,7 @@
 
 Practice product management interview cases against the clock, by voice or text. You get a random case, a countdown, and a structured critique across seven dimensions that names the **single biggest weakness** in your answer.
 
-Plain HTML, CSS and JavaScript. No framework, no build step, no backend, no account, no API keys.
+Plain HTML, CSS and JavaScript on the front end, one small serverless function for the shared leaderboard. No framework, no build step, no account.
 
 > **Scores are heuristic assessments of how a written answer matches common PM-answer patterns (structure, keywords, specificity). They are not hiring assessments and do not predict interview outcomes.**
 
@@ -58,10 +58,25 @@ This is keyword and structure matching. It cannot judge whether an idea is actua
 
 - **Voice dictation** through the browser's built-in speech recognition (Chrome, Edge, Safari). In Chrome the audio is processed by Google's servers; nothing is sent to this app. Basic punctuation is added to dictated text, and you can edit it before submitting.
 - **Share:** copy text, native share sheet, or download a score card image.
-- **Daily streak** and a **local leaderboard**. Both live in your browser's `localStorage` only; there is no shared leaderboard.
+- **Daily streak** and a **device leaderboard** stored in your browser's `localStorage`.
+- **Shared leaderboard** (opt-in): after a round you can post your score to a global board with an all-time and a 7-day view. See below.
 - Accessible controls, `prefers-reduced-motion` respected, works down to phone width.
 
+## Shared leaderboard
+
+Posting is opt-in. Nothing is sent unless you press **Post my score**.
+
+- `POST /api/scores` receives your name, your answer text and the case, **re-scores the answer on the server with the same `engine.js`**, and stores only the name, score, case type and timestamp. The score is never taken from the client, so a made-up number cannot be posted.
+- Your **answer text is used only for that verification and is not stored**.
+- Names are sanitised, answers under 30 words are rejected, and each client is limited to one post every 20 seconds.
+- `GET /api/scores` returns the top entries (all time and last 7 days).
+- Storage is a single JSON file in a private [Vercel Blob](https://vercel.com/docs/vercel-blob) store, updated with ETag-based optimistic concurrency.
+
+This is a practice leaderboard, not a competitive one: scoring is heuristic, so a determined person can still keyword-stuff an answer to score well.
+
 ## Run it locally
+
+The front end needs no build. For the static page only:
 
 ```bash
 git clone https://github.com/batool-fariha/pm-arena.git
@@ -69,16 +84,19 @@ cd pm-arena
 python3 -m http.server 8000
 ```
 
-Open http://localhost:8000. Use `localhost` or https, since the microphone needs a secure context.
+Open http://localhost:8000. Use `localhost` or https, since the microphone needs a secure context. Without the API running, the shared board shows as unavailable and the device board still works.
+
+To run the API too, link the project to a Vercel project that has a Blob store (`vercel link`, `vercel env pull`) and use `vercel dev`.
 
 ## Project structure
 
 - `index.html`: markup, styles and the app (home, case, result views)
 - `engine.js`: case generator and heuristic scoring engine (works in the browser and in Node)
+- `api/scores.js`: shared leaderboard serverless function (verifies scores with `engine.js`)
 
 ## Contributing
 
-Issues and pull requests are welcome. Good first areas: new case types, better scoring signals (with a test answer showing the change), and a shared leaderboard backend.
+Issues and pull requests are welcome. Good first areas: new case types, better scoring signals (with a test answer showing the change), and abuse protection for the shared board.
 
 ## License
 
