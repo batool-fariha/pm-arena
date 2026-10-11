@@ -121,7 +121,7 @@ td.n{font-family:var(--m);font-weight:600}
 .brief{position:sticky;top:92px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px}
 .brief .chip{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:.85rem;border-radius:999px;padding:5px 12px}
 .brief h2{font-size:1.9rem;margin-top:14px}
-.brief .pr{margin-top:14px;font-size:1.05rem}
+.brief .prompt{margin-top:14px;font-size:1.05rem;line-height:1.55}
 .brief ul{margin:10px 0 0;padding-left:1.1rem;color:var(--mute)}
 .brief .sub{margin-top:20px;font-weight:600;font-size:.95rem}
 .editor{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:0 30px 60px -40px rgba(36,87,255,.3)}
@@ -317,6 +317,16 @@ button.tlink{background:none;border:0;cursor:pointer}
 .cols .dim:first-child{padding-top:0}
 @media (max-width:860px){.rgrid{grid-template-columns:1fr}}
 
+
+/* setup card */
+.setup{margin-top:44px;background:#fff;border:1px solid var(--line);border-radius:28px;padding:clamp(22px,4vw,36px);box-shadow:0 20px 50px -34px rgba(13,14,18,.3);scroll-margin-top:24px}
+.shead h2{font-size:clamp(1.5rem,2.6vw,2rem);font-weight:500;letter-spacing:-.03em}
+.shead p{color:var(--mute);margin-top:6px;max-width:62ch}
+.setup .controls{border:0;padding:24px 0 0;margin-top:0}
+.sfoot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.sum{font-weight:500}
+.btn.big{padding:15px 30px;font-size:1.05rem}
+
 /* fun layer */
 .btn.primary:hover{box-shadow:0 0 0 4px rgba(53,224,165,.4),0 14px 34px -12px rgba(13,14,18,.6)}
 .btn.accent:hover{box-shadow:0 0 0 4px rgba(53,224,165,.45),0 14px 34px -12px rgba(36,87,255,.7)}
@@ -474,7 +484,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       <section class="stage">
         <h1 class="rise"><span class="soft">Get graded on</span><br>how you think.</h1>
         <p class="lead rise d1">Answer a random PM case on the clock. Get a critique that names the one weakness to fix.</p>
-        <div class="ctas rise d1"><button class="btn lime" id="go"><i class="ph ph-lightning"></i>Draw a case</button><a class="tlink" href="#scoring">How it is scored</a></div>
+        <div class="ctas rise d1"><button class="btn lime" id="goto"><i class="ph ph-arrow-down"></i>Set up a round</button><a class="tlink" href="#scoring">How it is scored</a></div>
         <div class="scene rise d2" id="scene">
           <svg class="wires" id="wires" aria-hidden="true"></svg>
           <span class="orb a" aria-hidden="true"></span><span class="orb b" aria-hidden="true"></span>
@@ -502,11 +512,15 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       <div class="ticker" aria-label="Case types">
         <div class="track">${[0,1].map(() => A.TYPES.map(t => `<span class="pillt"><i class="ph ph-${TICON[t.id]}"></i>${t.label}</span>`).join('')).join('')}</div>
       </div>
-      <div class="controls rise d3">
+      <section class="setup rise d3" id="setup" aria-labelledby="sh2">
+        <div class="shead"><h2 id="sh2">Set up your round</h2><p>Choose a time limit and a case type, add a name if you want to be on the leaderboard, then start.</p></div>
+        <div class="controls">
         <div><span class="lab" id="tl"><i class="ph ph-timer"></i>Time limit</span><div class="seg" role="group" aria-labelledby="tl">${[5,10,15].map(m => `<button data-lim="${m}" aria-pressed="${store.limit===m}">${m} min</button>`).join('')}</div></div>
         <div><label for="type"><i class="ph ph-squares-four"></i>Case type</label><select id="type"><option value="">Random</option>${A.TYPES.map(t => `<option value="${t.id}" ${store.type===t.id?'selected':''}>${t.label}</option>`).join('')}</select></div>
-        <div><label for="nick"><i class="ph ph-user-circle"></i>Name on the leaderboard</label><input type="text" id="nick" maxlength="20" placeholder="Anonymous" value="${esc(store.nick)}"></div>
+        <div><label for="nick"><i class="ph ph-user-circle"></i>Name on the leaderboard (optional)</label><input type="text" id="nick" maxlength="20" placeholder="Anonymous" value="${esc(store.nick)}"></div>
       </div>
+        <div class="sfoot"><p class="sum" id="sum" aria-live="polite"></p><button class="btn primary big" id="go"><i class="ph ph-play"></i>Start round</button></div>
+      </section>
 
       <section class="sec cols" id="how">
         <h2>Ten minutes. One clear next step.</h2>
@@ -547,7 +561,10 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       </section>
       ${footerHtml()}
     </div>`;
-    $app.querySelectorAll('[data-lim]').forEach(b => b.onclick = () => { store.limit = +b.dataset.lim; save(); $app.querySelectorAll('[data-lim]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+    const sum = () => { const t = document.getElementById('type').value, lab = (A.TYPES.find(x => x.id === t) || {}).label; document.getElementById('sum').textContent = `You get ${store.limit} minutes to answer ${lab ? 'a ' + lab.toLowerCase() + ' case' : 'one random case'}.`; };
+    $app.querySelectorAll('[data-lim]').forEach(b => b.onclick = () => { store.limit = +b.dataset.lim; save(); $app.querySelectorAll('[data-lim]').forEach(x => x.setAttribute('aria-pressed', x === b)); sum(); });
+    document.getElementById('type').onchange = sum; sum();
+    document.getElementById('goto').onclick = () => { const el = document.getElementById('setup'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => document.getElementById('go').focus({ preventScroll: true }), 450); };
     document.getElementById('go').onclick = () => {
       store.nick = document.getElementById('nick').value.trim().slice(0, 20);
       store.type = document.getElementById('type').value; save();
@@ -668,7 +685,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       <div class="bar"><div class="wrap"><span class="pill">${esc(c.label)}</span><span class="clock" id="clock" role="timer"></span></div></div>
       <div class="wrap"><div class="case">
         <aside class="brief rise"><span class="chip">${esc(c.label)}</span><h2>${esc(c.title)}</h2>
-          <p class="pr">${esc(c.prompt)}</p>${list}
+          <p class="prompt">${esc(c.prompt)}</p>${list}
           <p class="sub">What you know</p><ul>${c.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
           <p class="note">Some facts may be red herrings. Ask what you would need to know before answering.</p></aside>
         <div class="editor rise d1">
