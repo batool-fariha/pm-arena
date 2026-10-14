@@ -329,6 +329,39 @@ button.tlink{background:none;border:0;cursor:pointer}
 
 /* shared board */
 .note2{color:var(--mute);font-size:.9rem;margin-top:6px}
+/* progress + coach */
+.sparkbox{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px}
+.spark{width:100%;height:auto;display:block;overflow:visible}
+.spark .g{stroke:#e7e8ee;stroke-width:1}
+.spark .ln2{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.spark .dot{fill:#fff;stroke:var(--ink);stroke-width:2}
+.spark .dot.last{fill:var(--mint)}
+.avgs{margin-top:20px}
+.avg{display:grid;grid-template-columns:1fr auto;gap:2px 16px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.avg:first-child{border-top:0}
+.avg .sc{font:600 1.2rem var(--m)}
+.avg .ln{grid-column:1/3;height:3px;border-radius:3px;background:var(--accent);margin-top:6px}
+.avg.wk .ln{background:var(--ink)}
+.tagw{background:var(--mint);border-radius:999px;font-size:.75rem;font-weight:600;padding:2px 10px;margin-left:8px}
+.ans{white-space:pre-wrap;color:var(--mute);font-size:.95rem;background:#f4f5f9;border-radius:14px;padding:14px;margin-top:8px}
+.fu{padding:18px 0;border-top:1px solid var(--line)}
+.fu:first-child{border-top:0;padding-top:0}
+.fh{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.fu ul,.dn{margin:6px 0 0;padding-left:1.2rem}
+.fu li,.dn li{margin:6px 0}
+.coachcard{margin-top:24px;background:#fff;border:1px solid var(--line);border-radius:28px;padding:24px}
+.coachcard h3 i{color:var(--accent)}
+.skel{height:14px;border-radius:7px;background:linear-gradient(90deg,#eceef4,#f7f8fb,#eceef4);background-size:200% 100%;margin-top:12px}
+.skel.s2{width:70%}
+@media (prefers-reduced-motion:no-preference){.skel{animation:shim 1.2s linear infinite}@keyframes shim{to{background-position:-200% 0}}}
+.sumn{margin-top:16px;font-size:1.05rem}
+.bigw{background:var(--mint-soft);border-radius:20px;padding:18px 20px;margin-top:16px}
+.chip3{font-weight:600;font-size:.85rem;color:var(--mint-ink)}
+.bigw h3{margin-top:4px}.bigw p{margin-top:8px}
+blockquote{margin:10px 0 0;padding-left:14px;border-left:3px solid var(--mint);color:var(--ink);font-style:italic}
+.dn q{color:var(--mute);font-style:italic}
+.stronger{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.stronger p{margin-top:6px;font-size:1.05rem}
 /* fun layer */
 .btn.primary:hover{box-shadow:0 0 0 4px rgba(53,224,165,.4),0 14px 34px -12px rgba(13,14,18,.6)}
 .btn.accent:hover{box-shadow:0 0 0 4px rgba(53,224,165,.45),0 14px 34px -12px rgba(36,87,255,.7)}
@@ -409,7 +442,7 @@ tr.top1 td.n i{color:var(--mint-ink);font-size:1.2rem;vertical-align:-3px}
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const DISCLAIMER = 'Scores are heuristic assessments of how your answer matches common PM-answer patterns. They are not hiring assessments and do not predict interview outcomes.';
 
-  let store = { nick: '', limit: 10, type: '', lastDay: '', streak: 0, bestStreak: 0, board: [], played: 0 };
+  let store = { nick: '', limit: 10, type: '', lastDay: '', streak: 0, bestStreak: 0, board: [], played: 0, history: [] };
   try { Object.assign(store, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
   const today = () => new Date().toLocaleDateString('en-CA');
@@ -418,7 +451,7 @@ tr.top1 td.n i{color:var(--mint-ink);font-size:1.2rem;vertical-align:-3px}
 
   let state = { scope: 'global', posted: null, bump: false, c: null, end: 0, timer: null, answer: '', res: null, board: 'all', entry: null };
 
-  const TICON = { retention: 'trend-down', conversion: 'funnel', buildvsbuy: 'scales', launch: 'rocket-launch', prioritize: 'list-numbers', design: 'pencil-ruler' };
+  const TICON = { retention: 'trend-down', conversion: 'funnel', buildvsbuy: 'scales', launch: 'rocket-launch', prioritize: 'list-numbers', design: 'pencil-ruler', metrics: 'chart-line-up' };
   const ICON = { framing: 'crosshair', clarify: 'chat-circle-dots', segmentation: 'chart-pie-slice', hypothesis: 'flask', metrics: 'gauge', prioritization: 'list-numbers', communication: 'megaphone-simple' };
 
   const LOGO = (n) => `<svg width="${n}" height="${n}" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#0d0e12"/><rect x="5" y="9" width="22" height="14" rx="7" fill="none" stroke="#fff" stroke-width="2"/><rect x="10" y="13" width="12" height="6" rx="3" fill="#35e0a5"/></svg>`;
@@ -507,7 +540,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
           <div class="col r">
             <span class="node m" id="wF"><i class="ph ph-share-network"></i></span>
             <div class="tile mint" id="wC"><b>1</b><span class="t">weakness named per answer</span></div>
-            <span class="pillt" id="wD"><i class="ph ph-squares-four"></i>6 case types</span>
+            <span class="pillt" id="wD"><i class="ph ph-squares-four"></i>7 case types</span>
           </div>
         </div>
       </section>
@@ -556,6 +589,8 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
         </div>
       </section>
 
+      ${progressHtml()}
+
       <section class="sec" id="lb-sec">
         <div class="row" style="justify-content:space-between;align-items:end"><div><h2>Leaderboard</h2><p class="lead" style="margin-top:8px">Your best: ${best || 0} out of 100 across ${store.played} scored ${store.played===1?'case':'cases'}. Post a score after a round to join the shared board.</p></div>
           ${boardCtl()}</div>
@@ -572,6 +607,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       store.type = document.getElementById('type').value; save();
       start(A.generateCase(store.type));
     };
+    const ch = document.getElementById('clearhist'); if (ch) ch.onclick = () => { if (confirm('Clear your round history on this device?')) { store.history = []; save(); home(); } };
     playground(); wireBoard(); countUp(); window.scrollTo(0, 0);
     requestAnimationFrame(() => requestAnimationFrame(wires)); if (document.fonts && document.fonts.ready) document.fonts.ready.then(wires);
   }
@@ -738,6 +774,8 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       state.entry = { nick: store.nick || 'Anonymous', score: res.overall, type: state.c.label, ts: Date.now() };
       store.board.push(state.entry);
       store.board = store.board.sort((a, b) => b.score - a.score).slice(0, 50);
+      const dm = {}; res.dims.forEach(d => { dm[d.id] = d.score; });
+      store.history = (store.history || []).concat([{ ts: Date.now(), overall: res.overall, dims: dm, weakest: res.weakest.id, type: state.c.label, title: state.c.title, answer: state.answer.slice(0, 6000) }]).slice(-30);
       save();
     }
     result();
@@ -780,6 +818,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
         <div><h2>Full critique</h2><p class="lead">Open a row to see what was matched, what was not, and a fix written for this case.</p></div>
         <div class="dims">${dimHtml}</div>
       </section>
+      ${practiceHtml()}
       <section class="sec" id="lb-sec"><div class="row" style="justify-content:space-between;align-items:end"><h2>Leaderboard</h2>
         ${boardCtl()}</div>
         <div id="lb" style="margin-top:20px">${boardHtml(state.entry)}</div></section>
@@ -808,7 +847,59 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
     };
     document.getElementById('next').onclick = () => start(A.generateCase(store.type));
     document.getElementById('retry').onclick = () => start(state.c);
-    wireBoard(); countUp(); window.scrollTo(0, 0); if (r.overall >= 75) burst(); state.bump = false;
+    initCoach(); wireBoard(); countUp(); window.scrollTo(0, 0); if (r.overall >= 75) burst(); state.bump = false;
+  }
+
+  /* ---------- progress ---------- */
+  const dimName = id => (A.DIMS.find(d => d.id === id) || {}).name || id;
+  function progressHtml() {
+    const h = store.history || [];
+    if (!h.length) return '';
+    const last = h.slice(-20), W = 560, H = 140, pad = 16;
+    const pts = last.map((e, i) => [pad + (last.length === 1 ? (W - 2 * pad) / 2 : i * (W - 2 * pad) / (last.length - 1)), pad + (H - 2 * pad) * (1 - e.overall / 100)]);
+    const svg = `<svg viewBox="0 0 ${W} ${H}" class="spark" role="img" aria-label="Overall score across your last ${last.length} rounds, most recent ${last[last.length - 1].overall}">
+      ${[0, 50, 100].map(v => `<line x1="0" x2="${W}" y1="${pad + (H - 2 * pad) * (1 - v / 100)}" y2="${pad + (H - 2 * pad) * (1 - v / 100)}" class="g"/>`).join('')}
+      <polyline points="${pts.map(p => p.join(',')).join(' ')}" class="ln2"/>
+      ${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === pts.length - 1 ? 6 : 3.5}" class="${i === pts.length - 1 ? 'dot last' : 'dot'}"/>`).join('')}</svg>`;
+    const avgs = A.DIMS.map(d => { const v = h.map(e => e.dims && e.dims[d.id]).filter(x => typeof x === 'number'); return { d, avg: v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null }; }).filter(x => x.avg !== null).sort((a, b) => a.avg - b.avg);
+    const rows = avgs.map((x, i) => `<div class="avg ${i === 0 ? 'wk' : ''}"><span class="nm"><span class="di"><i class="ph ph-${ICON[x.d.id]}"></i></span><b>${x.d.name}</b>${i === 0 && avgs.length > 1 ? '<span class="tagw">weakest on average</span>' : ''}</span><b class="sc">${x.avg}</b><i class="ln" style="width:${Math.max(3, x.avg)}%"></i></div>`).join('');
+    const recent = h.slice(-8).reverse().map(e => `<details class="dim"><summary><span class="nm"><span class="di"><i class="ph ph-clock-counter-clockwise"></i></span><span><b>${esc(e.title)}</b> <span class="w">${new Date(e.ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, weakest: ${esc(dimName(e.weakest))}</span></span></span><b class="sc">${e.overall}</b></summary>
+        <p class="ans">${esc(e.answer || '')}</p></details>`).join('');
+    return `<section class="sec cols" id="progress"><div><h2>Your progress</h2><p class="lead">From your last ${h.length} scored ${h.length === 1 ? 'round' : 'rounds'}, stored on this device only.</p><p style="margin-top:16px"><button class="btn ghost" id="clearhist"><i class="ph ph-trash"></i>Clear history</button></p></div>
+      <div><div class="sparkbox">${svg}</div><div class="avgs">${rows}</div><h3 style="margin-top:32px">Recent rounds</h3><div class="dims" style="margin-top:8px">${recent}</div></div></section>`;
+  }
+  function practiceHtml() {
+    const r = state.res, worst = r.dims.slice().sort((a, b) => b.weight * (100 - b.score) - a.weight * (100 - a.score)).slice(0, 3);
+    const qs = worst.map(d => `<div class="fu"><div class="fh"><span class="di"><i class="ph ph-${ICON[d.id]}"></i></span><b>${d.name}</b></div><ul>${A.followUps(d.id).slice(0, 2).map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>`).join('');
+    return `<section class="sec cols" id="coach"><div><h2>Practise next</h2><p class="lead">Follow-ups an interviewer could ask about your weakest areas. Say your answers out loud.</p></div><div>${qs}<div id="coachbox"></div></div></section>`;
+  }
+  async function initCoach() {
+    const box = document.getElementById('coachbox'); if (!box || !state.res.counts) return;
+    let on = false; try { on = (await (await fetch('/api/grade', { cache: 'no-store' })).json()).enabled; } catch (e) {}
+    if (!on || !document.getElementById('coachbox')) return;
+    box.innerHTML = `<div class="coachcard"><h3><i class="ph ph-sparkle"></i> AI coach notes</h3>
+      <p class="note2">An AI model reads your answer and writes specific notes that quote what you said. Your answer and the case are sent to Anthropic's API through this app's server for this one request. Nothing is stored. Notes can be wrong and are not a hiring assessment.</p>
+      <button class="btn lime" id="coachgo" style="margin-top:14px"><i class="ph ph-sparkle"></i>Get AI coach notes</button><div id="coachout" aria-live="polite"></div></div>`;
+    document.getElementById('coachgo').onclick = async () => {
+      const go = document.getElementById('coachgo'), out = document.getElementById('coachout'), c = state.c;
+      go.disabled = true; out.innerHTML = '<p class="note2" style="margin-top:14px">Reading your answer. This takes up to 20 seconds.</p><div class="skel"></div><div class="skel s2"></div><div class="skel"></div>';
+      try {
+        const rr = await fetch('/api/grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answer: state.answer, case: { type: c.type, title: c.title, prompt: c.prompt, list: c.list } }) });
+        const j = await rr.json().catch(() => ({}));
+        if (rr.ok && j.ok) { go.hidden = true; out.innerHTML = notesHtml(j.notes); return; }
+        go.disabled = false;
+        out.innerHTML = `<p class="alert" style="margin-top:14px"><i class="ph-fill ph-warning-circle"></i><span>${rr.status === 429 ? 'You have used today\'s AI coach notes. Try again tomorrow.' : 'The AI coach could not respond. Try again in a moment.'}</span></p>`;
+      } catch (e) { go.disabled = false; out.innerHTML = '<p class="alert" style="margin-top:14px"><i class="ph-fill ph-warning-circle"></i><span>Could not reach the server. Check your connection and try again.</span></p>'; }
+    };
+  }
+  function notesHtml(n) {
+    const w = n.biggest_weakness;
+    return `<div class="notes"><p class="sumn">${esc(n.summary)}</p>
+      <div class="bigw"><span class="chip3">Biggest weakness, AI read</span><h3>${esc(dimName(w.dimension))}</h3><p>${esc(w.why)}</p>${w.evidence_quote ? `<blockquote>\u201c${esc(w.evidence_quote)}\u201d</blockquote>` : ''}<p><b>Fix:</b> ${esc(w.fix)}</p></div>
+      <ul class="dn">${n.dimension_notes.map(x => `<li><b>${esc(dimName(x.dimension))}.</b> ${esc(x.note)}${x.quote ? ` <q>${esc(x.quote)}</q>` : ''}</li>`).join('')}</ul>
+      ${n.stronger_sentence ? `<div class="stronger"><b>A sentence that would have helped</b><p>\u201c${esc(n.stronger_sentence)}\u201d</p></div>` : ''}
+      ${n.follow_up_questions.length ? `<p style="margin-top:18px"><b>More follow-ups</b></p><ul class="dn">${n.follow_up_questions.map(q => `<li>${esc(q)}</li>`).join('')}</ul>` : ''}
+      <p class="note2">Generated by an AI model from your answer. It can be wrong.</p></div>`;
   }
 
   /* ---------- leaderboard ---------- */
@@ -888,6 +979,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       const ang = Math.random() * Math.PI * 2, dist = 110 + Math.random() * 190;
       d.animate([{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist + 90}px) rotate(${Math.random() * 540}deg)`, opacity: 0 }],
         { duration: 1100 + Math.random() * 600, easing: 'cubic-bezier(.16,1,.3,1)' }).onfinish = () => d.remove();
+      setTimeout(() => d.remove(), 4000);
     }
   }
   document.addEventListener('pointermove', e => {

@@ -24,9 +24,9 @@ Success looks like: repeat rounds per visitor, rising scores on the weakest dime
 
 ## How a round works
 
-1. **Draw a case.** Six types, generated with random parameters: retention drop, conversion fall, build vs buy, new market launch, prioritize five features, design for a specific user.
+1. **Draw a case.** Seven types, generated with random parameters: retention drop, conversion fall, build vs buy, new market launch, prioritize five features, design for a specific user, define success metrics.
 2. **Answer on the clock** (5, 10 or 15 minutes), typed or dictated. Section starters (Questions, Segments, Hypothesis, Metrics, Recommend) drop a scaffold into the answer box. Time expiry auto-submits.
-3. **Get graded.** Seven scores, a critique per dimension, the biggest weakness, and a shareable result.
+3. **Get graded.** Seven scores, a critique per dimension, the biggest weakness, interviewer-style follow-up questions for your weakest areas, and a shareable result.
 
 ## Scoring model
 
@@ -58,9 +58,22 @@ This is keyword and structure matching. It cannot judge whether an idea is actua
 
 - **Voice dictation** through the browser's built-in speech recognition (Chrome, Edge, Safari). In Chrome the audio is processed by Google's servers; nothing is sent to this app. Basic punctuation is added to dictated text, and you can edit it before submitting.
 - **Share:** copy text, native share sheet, or download a score card image.
+- **Progress and history:** a trend of your recent scores, your average per dimension (with the weakest flagged), and the last rounds with your answers, all stored on your device. Clear it any time.
+- **AI coach notes** (optional, needs an API key; see below).
 - **Daily streak** and a **device leaderboard** stored in your browser's `localStorage`.
 - **Shared leaderboard** (opt-in): after a round you can post your score to a global board with an all-time and a 7-day view. See below.
 - Accessible controls, `prefers-reduced-motion` respected, works down to phone width.
+
+## AI coach notes
+
+An optional second opinion. After a round, **Get AI coach notes** asks a Claude model to read the answer and write specific notes: what the answer did, the biggest weakness with a quote from the answer, a note per dimension, and one sentence that would have helped.
+
+- It returns **notes only, no second score**, so the deterministic heuristic score stays the single source of truth for the leaderboard.
+- Quotes are **verified against your answer** on the server and dropped if they are not verbatim, so the coach cannot invent things you never said.
+- The answer is treated as untrusted data and the model is forced to reply through one structured tool call.
+- It is **opt-in per round**. Pressing the button sends your answer and the case to Anthropic's API through `api/grade.js`. Nothing is stored here.
+- It is **disabled unless `ANTHROPIC_API_KEY` is set**; the button does not appear otherwise. Optional env vars: `ANTHROPIC_MODEL`, `AI_DAILY_PER_CLIENT` (default 8), `AI_DAILY_GLOBAL` (default 400). Daily caps are counted in the same Blob store.
+- Notes are generated and can be wrong. They are not a hiring assessment.
 
 ## Shared leaderboard
 
@@ -93,6 +106,17 @@ To run the API too, link the project to a Vercel project that has a Blob store (
 - `index.html`: markup, styles and the app (home, case, result views)
 - `engine.js`: case generator and heuristic scoring engine (works in the browser and in Node)
 - `api/scores.js`: shared leaderboard serverless function (verifies scores with `engine.js`)
+- `api/grade.js`: optional AI coach notes function
+- `test/`: unit tests for the engine and the AI-response validation
+
+## Tests
+
+```bash
+npm install
+npm test
+```
+
+Covers the scoring engine (weights, case generation and server-side rebuild parity, short and off-topic guards, biggest-weakness selection) and the validation applied to AI coach replies. CI runs them on every push.
 
 ## Contributing
 

@@ -76,6 +76,15 @@
       { label: 'dependencies / sequencing', re: /(depend|sequenc|unblock|prerequisite|foundation)/ },
       { label: 'learning / risk reduction', re: /(learn|de-?risk|experiment|test first|cheap test)/ },
     ],
+    metr: [
+      { label: 'a primary / north-star metric', re: /(north star|primary metric|success metric|key metric|main metric)/ },
+      { label: 'input / leading metrics', re: /(input metric|leading|driver metric|activation|adoption|engagement rate)/ },
+      { label: 'guardrail metrics', re: /(guardrail|counter-?metric|must not (drop|get worse)|trade-?off metric)/ },
+      { label: 'baseline and target', re: /(baseline|target|threshold|benchmark|lift|mde|minimum detectable)/ },
+      { label: 'experiment design', re: /(a\/b|holdout|control group|experiment|sample size|statistical|duration|ramp)/ },
+      { label: 'instrumentation / data quality', re: /(instrument|event|tracking|logging|data quality|attribution)/ },
+      { label: 'side effects / cannibalization', re: /(cannibal|novelty|side effect|unintended|gaming|vanity)/ },
+    ],
     design: [
       { label: 'pain points', re: /(pain|problem|friction|struggle|frustrat|unmet need)/ },
       { label: 'jobs / motivations', re: /(job to be done|jtbd|\bneeds?\b|motivation|trying to get done)/ },
@@ -96,6 +105,12 @@
     { name: 'a language-learning app', users: 'learners' },
     { name: 'a consumer budgeting and payments app', users: 'account holders' },
     { name: 'a short-video creator platform', users: 'creators' },
+    { name: 'a ride-hailing app', users: 'riders' },
+    { name: 'a telehealth booking platform', users: 'patients' },
+    { name: 'a second-hand fashion marketplace', users: 'sellers' },
+    { name: 'an invoicing tool for freelancers', users: 'freelancers' },
+    { name: 'a meditation and sleep app', users: 'listeners' },
+    { name: 'a developer API platform', users: 'developers' },
   ];
 
   const TYPES = [
@@ -105,6 +120,7 @@
     { id: 'launch', label: 'New market launch' },
     { id: 'prioritize', label: 'Prioritize 5 features' },
     { id: 'design', label: 'Design for a user' },
+    { id: 'metrics', label: 'Define success metrics' },
   ];
 
   const GEN = {
@@ -116,6 +132,8 @@
         'Engineering reports no major outages.',
         'Early dashboards hint the drop is larger on one platform, but nobody has verified it.',
         'Support tickets mentioning "can\'t find" something are up.',
+        'A competitor launched a free tier last month.',
+        'The last app release changed the push notification schedule.',
       ]).slice(0, 3);
       return {
         type: 'retention', diagnostic: true, drivers: 'diag',
@@ -140,6 +158,8 @@
         'Trial length was changed from 14 to 7 days last quarter.',
         'The free tier received two new features this month.',
         'Mobile web share of traffic grew noticeably.',
+        'The annual plan discount was removed from the pricing page.',
+        'Support reports more questions about invoices before upgrading.',
       ]).slice(0, 3);
       return {
         type: 'conversion', diagnostic: true, drivers: 'diag',
@@ -158,7 +178,7 @@
     },
     buildvsbuy() {
       const ctx = pick(CONTEXTS);
-      const cap = pick(['personalized recommendations', 'in-app search', 'fraud detection', 'customer-support chat', 'product analytics', 'notification delivery']);
+      const cap = pick(['personalized recommendations', 'in-app search', 'fraud detection', 'customer-support chat', 'product analytics', 'notification delivery', 'identity verification', 'A/B testing', 'email deliverability']);
       const months = int(4, 9), eng = int(3, 6), vendor = int(60, 240);
       return {
         type: 'buildvsbuy', diagnostic: false, drivers: 'bvb',
@@ -176,7 +196,7 @@
       };
     },
     launch() {
-      const ctx = pick(CONTEXTS), country = pick(['Brazil', 'Indonesia', 'Germany', 'Nigeria', 'Mexico', 'Japan', 'Poland']);
+      const ctx = pick(CONTEXTS), country = pick(['Brazil', 'Indonesia', 'Germany', 'Nigeria', 'Mexico', 'Japan', 'Poland', 'Vietnam', 'Turkey', 'Egypt', 'Colombia', 'Spain', 'Kenya']);
       const q = int(2, 4), team = int(5, 12);
       return {
         type: 'launch', diagnostic: false, drivers: 'launch',
@@ -195,7 +215,7 @@
     },
     prioritize() {
       const ctx = pick(CONTEXTS);
-      const pool = ['Dark mode', 'Referral program', 'Offline mode', 'AI-generated recommendations', 'Leaderboards and social sharing', 'In-app live chat support', 'Annual-plan discount', 'Personalized push notifications', 'Public API', 'Bulk import/export', 'Saved searches and wishlists', 'Team accounts'];
+      const pool = ['Dark mode', 'Referral program', 'Offline mode', 'AI-generated recommendations', 'Leaderboards and social sharing', 'In-app live chat support', 'Annual-plan discount', 'Personalized push notifications', 'Public API', 'Bulk import/export', 'Saved searches and wishlists', 'Team accounts', 'Calendar sync', 'Voice input', 'Smart search', 'Family plan'];
       const list = shuffle(pool).slice(0, 5).map((name) => ({ name, effort: int(2, 14), ask: int(2, 18) }));
       return {
         type: 'prioritize', diagnostic: false, drivers: 'prio',
@@ -213,8 +233,26 @@
         },
       };
     },
+    metrics() {
+      const ctx = pick(CONTEXTS);
+      const feat = pick(['a "save for later" button', 'an AI summary of long threads', 'one-tap reorder', 'a referral program', 'in-app scheduling', 'a streak-freeze feature', 'a shared family plan']);
+      return {
+        type: 'metrics', diagnostic: false, drivers: 'metr',
+        clarify: ['goal', 'success', 'user', 'scale', 'baseline'],
+        title: 'Define success metrics',
+        prompt: `${ctx.name[0].toUpperCase() + ctx.name.slice(1)} is launching ${feat}. Define how you would measure whether it is a success, and what you would watch out for.`,
+        facts: ['It ships to 10% of users first.', 'No baseline data exists for this behavior yet.', 'Leadership wants a go/no-go on full rollout after 4 weeks.'],
+        sample: {
+          framing: 'Start from the user and business goal the feature serves, then say what decision the metrics must support (full rollout, iterate, or stop).',
+          segmentation: 'Say which users you would read the metric for: new vs existing, heavy vs light, and the 10% exposed group vs the control group.',
+          hypothesis: 'State the causal bet: "We believe the feature raises X because it removes Y. If true, we should see Z within 4 weeks."',
+          metrics: 'Name one primary metric, two input metrics, and two guardrails. Give a baseline source (or how you would get one), a target lift, and the experiment design (holdout, duration, minimum detectable effect).',
+          prioritization: 'Say which metric wins when they conflict, and the exact threshold that triggers go, iterate or stop.',
+        },
+      };
+    },
     design() {
-      const persona = pick(['night-shift nurses trying to protect their sleep', 'first-time home buyers', 'freelancers chasing late invoices', 'smallholder farmers selling produce', 'visually impaired daily commuters', 'new parents managing childcare logistics']);
+      const persona = pick(['night-shift nurses trying to protect their sleep', 'first-time home buyers', 'freelancers chasing late invoices', 'smallholder farmers selling produce', 'visually impaired daily commuters', 'new parents managing childcare logistics', 'gig delivery riders on long shifts', 'small cafe owners managing inventory', 'students preparing for exams', 'caregivers of elderly parents']);
       const n = int(4, 8), m = int(3, 6);
       return {
         type: 'design', diagnostic: false, drivers: 'design',
@@ -242,6 +280,7 @@
       launch: tok(c.title.replace('Launch in ', '')) + '|expansion|locali[sz]|regulat|go-to-market|\\bgtm\\b|beachhead|country',
       prioritize: (c.list || []).map((f) => tok(f.name)).filter(Boolean).join('|') + '|engineering-weeks|capacity|roadmap',
       design: tok(c.prompt.split('. ')[0].replace('Design a product for ', '')),
+      metrics: 'metric|measure|a\\/b|holdout|guardrail|north star|rollout|control group',
     }[id];
   }
 
@@ -452,6 +491,17 @@
     return c;
   }
 
+  const FOLLOWUPS = {
+    framing: ['Restate the problem in one sentence. What decision does this answer support?', 'What assumption in your framing, if wrong, would change your whole answer?', 'Who is the stakeholder asking, and what do they care about most?'],
+    clarify: ['You can ask me only two questions. Which two, and why those?', 'What would you need to know before committing to a recommendation?', 'Which of your assumptions could I confirm or deny right now?'],
+    segmentation: ['Which single segment would you look at first, and what would make you switch?', 'Is this problem the same for new and existing users? How do you know?', 'If the effect is concentrated in one group, what do you do differently?'],
+    hypothesis: ['What is the cheapest test that could prove your top hypothesis wrong?', 'If your first hypothesis is false, what is your next one and why?', 'What result would make you abandon this line of thinking?'],
+    metrics: ['The primary metric improves but your guardrail drops. What do you do?', 'What baseline and target would you set, and where would the baseline come from?', 'How long would you run it, and how would you know the result is not noise?'],
+    prioritization: ['You can only do one thing this quarter. What is it, and what are you saying no to?', 'What would change your ranking: new data, a new constraint, or a stakeholder?', 'How would you explain the cut items to the people who wanted them?'],
+    communication: ['Give me your answer in 30 seconds, recommendation first.', 'What is the one number or fact you would lead with?', 'What are the next three steps, who owns each, and by when?'],
+  };
+  function followUps(dimId) { return (FOLLOWUPS[dimId] || []).slice(); }
+
   function band(n) {
     if (n >= 90) return 'Very strong signals';
     if (n >= 75) return 'Strong structure';
@@ -460,7 +510,7 @@
     return 'Early draft';
   }
 
-  const api = { TYPES, CLARIFY, generateCase, scoreAnswer, band, DIMS, rebuildCase };
+  const api = { TYPES, CLARIFY, generateCase, scoreAnswer, band, DIMS, rebuildCase, followUps };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Arena = api;
 })(typeof window !== 'undefined' ? window : globalThis);
