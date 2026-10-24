@@ -67,7 +67,7 @@ Success: `200 { "ok": true, "score": 76, "rank": 3, "nick": "Sam", "ts": 1791747
 
 | Status | `error` | Meaning |
 |---|---|---|
-| 400 | `bad_request`, `answer_too_long`, `bad_case`, `answer_too_short` | Invalid input. Answers must be 30 to about 8000 characters of at least 30 words |
+| 400 | `bad_request`, `answer_too_long`, `bad_case`, `answer_too_short` | Invalid input. Answers need at least 30 words and at most 8000 characters |
 | 405 | `method_not_allowed` | Only GET and POST |
 | 429 | `slow_down` | Same client posted within 20 seconds |
 | 503 | `busy` | Four write attempts collided; retry |
