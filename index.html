@@ -327,6 +327,13 @@ button.tlink{background:none;border:0;cursor:pointer}
 .sum{font-weight:500}
 .btn.big{padding:15px 30px;font-size:1.05rem}
 
+/* drills */
+.brief>.drillbar:first-child{margin:0 0 18px}
+.drillbar{margin-top:20px;background:var(--mint-soft);border-radius:20px;padding:18px 20px}
+.drillbar h3{margin-top:4px}.drillbar p{margin-top:6px}
+.chk{margin:8px 0 0;padding-left:1.2rem}.chk li{margin:5px 0}
+.hintbox{margin-top:12px}.hintbox summary{cursor:pointer;font-weight:600}
+.hintbox ul{margin:6px 0 0;padding-left:1.2rem}
 /* shared board */
 .note2{color:var(--mute);font-size:.9rem;margin-top:6px}
 /* progress + coach */
@@ -442,14 +449,14 @@ tr.top1 td.n i{color:var(--mint-ink);font-size:1.2rem;vertical-align:-3px}
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const DISCLAIMER = 'Scores are heuristic assessments of how your answer matches common PM-answer patterns. They are not hiring assessments and do not predict interview outcomes.';
 
-  let store = { nick: '', limit: 10, type: '', lastDay: '', streak: 0, bestStreak: 0, board: [], played: 0, history: [] };
+  let store = { nick: '', limit: 10, type: '', lastDay: '', streak: 0, bestStreak: 0, board: [], played: 0, history: [], drills: [] };
   try { Object.assign(store, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
   const today = () => new Date().toLocaleDateString('en-CA');
   const dayDiff = (a, b) => Math.round((Date.parse(a) - Date.parse(b)) / 864e5);
   const liveStreak = () => store.lastDay && dayDiff(today(), store.lastDay) <= 1 ? store.streak : 0;
 
-  let state = { scope: 'global', posted: null, bump: false, c: null, end: 0, timer: null, answer: '', res: null, board: 'all', entry: null };
+  let state = { drill: null, limitMs: 0, scope: 'global', posted: null, bump: false, c: null, end: 0, timer: null, answer: '', res: null, board: 'all', entry: null };
 
   const TICON = { retention: 'trend-down', conversion: 'funnel', buildvsbuy: 'scales', launch: 'rocket-launch', prioritize: 'list-numbers', design: 'pencil-ruler', metrics: 'chart-line-up' };
   const ICON = { framing: 'crosshair', clarify: 'chat-circle-dots', segmentation: 'chart-pie-slice', hypothesis: 'flask', metrics: 'gauge', prioritization: 'list-numbers', communication: 'megaphone-simple' };
@@ -607,6 +614,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
       store.type = document.getElementById('type').value; save();
       start(A.generateCase(store.type));
     };
+    const da = document.getElementById('drillavg'); if (da) da.onclick = () => startDrill(da.dataset.dim);
     const ch = document.getElementById('clearhist'); if (ch) ch.onclick = () => { if (confirm('Clear your round history on this device?')) { store.history = []; save(); home(); } };
     playground(); wireBoard(); countUp(); window.scrollTo(0, 0);
     requestAnimationFrame(() => requestAnimationFrame(wires)); if (document.fonts && document.fonts.ready) document.fonts.ready.then(wires);
@@ -714,15 +722,16 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
   }
 
   /* ---------- case ---------- */
-  function start(c) {
+  function start(c, opts) {
     stopMic();
-    state.c = c; state.answer = ''; state.end = Date.now() + store.limit * 60000;
+    state.c = c; state.answer = ''; state.drill = opts && opts.drill ? opts.drill : null;
+    state.limitMs = state.drill ? 3 * 60000 : store.limit * 60000; state.end = Date.now() + state.limitMs;
     const list = c.list ? `<ul>${c.list.map(f => `<li><b style="color:var(--ink)">${esc(f.name)}</b>, about ${f.effort} eng-weeks, in ${f.ask}% of feedback</li>`).join('')}</ul>` : '';
     nav();
     $app.innerHTML = `<div class="prog" id="fill"></div>
       <div class="bar"><div class="wrap"><span class="pill">${esc(c.label)}</span><span class="clock" id="clock" role="timer"></span></div></div>
       <div class="wrap"><div class="case">
-        <aside class="brief rise"><span class="chip">${esc(c.label)}</span><h2>${esc(c.title)}</h2>
+        <aside class="brief rise">${drillPanel(c)}<span class="chip">${esc(c.label)}</span><h2>${esc(c.title)}</h2>
           <p class="prompt">${esc(c.prompt)}</p>${list}
           <p class="sub">What you know</p><ul>${c.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
           <p class="note">Some facts may be red herrings. Ask what you would need to know before answering.</p></aside>
@@ -748,7 +757,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
     if (SR) document.getElementById('mic').onclick = toggleMic;
     document.getElementById('submit').onclick = () => submit(false);
     document.getElementById('quit').onclick = () => { if (confirm('Abandon this case? Nothing will be scored.')) home(); };
-    const total = store.limit * 60000;
+    const total = state.limitMs;
     const tick = () => {
       const left = Math.max(0, state.end - Date.now()), s = Math.ceil(left / 1000);
       const ck = document.getElementById('clock'); if (!ck) return;
@@ -763,6 +772,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
   /* ---------- submit ---------- */
   function submit(auto) {
     stopMic(); clearInterval(state.timer); state.timer = null;
+    if (state.drill) return submitDrill(auto);
     const res = A.scoreAnswer(state.answer, state.c);
     state.res = res; state.auto = auto; state.entry = null;
     if (res.counts) {
@@ -805,7 +815,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
           </div>
           <div class="rise d1">
             <div class="tile mint wkt"><span class="chip2"><i class="ph ph-${ICON[w.id]}"></i></span><span class="k">Single biggest weakness</span><h2>${w.name}</h2>
-              <p><b>${w.score} out of 100, weight ${w.weight}.</b> ${w.missing.length ? esc(w.missing[0].replace(/[.:?]?$/, '.')) + ' ' : ''}${esc(w.fix)}</p></div>
+              <p><button class="btn primary" id="drillw" style="margin-bottom:14px"><i class="ph ph-barbell"></i>Drill this for 3 minutes</button></p><p><b>${w.score} out of 100, weight ${w.weight}.</b> ${w.missing.length ? esc(w.missing[0].replace(/[.:?]?$/, '.')) + ' ' : ''}${esc(w.fix)}</p></div>
             <div class="share"><h3>Share your result</h3><div class="pre" id="sh">${esc(shareText())}</div>
               <div class="row" style="margin-top:14px"><button class="btn primary" id="copy"><i class="ph ph-copy"></i>Copy text</button><button class="btn ghost" id="nat"><i class="ph ph-share-network"></i>Share</button><button class="btn ghost" id="png"><i class="ph ph-download-simple"></i>Download image</button><span id="msg" role="status" style="color:#14744a"></span></div></div>
             ${r.counts ? `<div class="share"><h3>Join the shared leaderboard</h3><p class="note2">Posting sends your name and answer text to the server once, so it can re-score your answer and block made-up scores. The answer is not stored.</p>
@@ -847,7 +857,55 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
     };
     document.getElementById('next').onclick = () => start(A.generateCase(store.type));
     document.getElementById('retry').onclick = () => start(state.c);
+    document.getElementById('drillw').onclick = () => startDrill(w.id);
     initCoach(); wireBoard(); countUp(); window.scrollTo(0, 0); if (r.overall >= 75) burst(); state.bump = false;
+  }
+
+  /* ---------- drills ---------- */
+  function startDrill(dimId) { start(A.generateCase(), { drill: dimId }); }
+  function drillPanel(c) {
+    if (!state.drill) return '';
+    const info = A.drillInfo(state.drill, c.diagnostic), name = dimName(state.drill);
+    let hints = '';
+    if (state.drill === 'clarify') hints = `<p><b>Topics worth asking about for this case</b></p><ul>${c.clarify.map(k => `<li>${esc(A.CLARIFY[k].q)}</li>`).join('')}</ul>`;
+    if (state.drill === 'hypothesis') hints = `<p><b>Kinds of cause worth considering for this case</b></p><ul>${A.driverLabels(c).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+    return `<div class="drillbar"><span class="chip3">Drill, 3 minutes</span><h3>${esc(name)}</h3><p>${esc(info.focus)}</p>
+      <p style="margin-top:10px"><b>What the scorer looks for</b></p><ul class="chk">${info.checklist.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+      ${hints ? `<details class="hintbox"><summary>Show hints</summary>${hints}</details>` : ''}
+      <p class="note2">Write about the case on this page, in 60 to 150 words. Only ${esc(name.toLowerCase())} is scored in a drill.</p></div>`;
+  }
+  function submitDrill(auto) {
+    const res = A.scoreAnswer(state.answer, state.c), dim = res.dims.find(d => d.id === state.drill);
+    state.res = res; state.auto = auto;
+    if (res.counts) {
+      const t = today();
+      if (store.lastDay !== t) { store.streak = store.lastDay && dayDiff(t, store.lastDay) === 1 ? store.streak + 1 : 1; store.lastDay = t; }
+      store.bestStreak = Math.max(store.bestStreak, store.streak);
+      store.drills = (store.drills || []).concat([{ ts: Date.now(), dim: state.drill, score: dim.score, type: state.c.label }]).slice(-50);
+      save();
+    }
+    drillResult(dim);
+  }
+  function drillResult(dim) {
+    nav();
+    const r = state.res, prev = (store.history || []).map(e => e.dims && e.dims[dim.id]).filter(x => typeof x === 'number');
+    const avg = prev.length ? Math.round(prev.reduce((a, b) => a + b, 0) / prev.length) : null, passed = dim.score >= 70;
+    $app.innerHTML = `<div class="wrap">
+      <section class="stage rs"><span class="orb a" aria-hidden="true" style="right:-10%;top:-34%"></span>
+        <div class="rgrid"><div class="rleft rise">${ring(dim.score, 'd')}
+          <h2>${passed ? 'Drill passed' : 'Not there yet'}</h2>
+          <p class="sub2">${esc(dim.name)}, ${state.auto ? 'time expired' : 'submitted'}. ${passed ? 'You cleared 70.' : 'Aim for 70 or more.'}${avg !== null ? ` Your average in full rounds is ${avg}.` : ''} A heuristic assessment, not a hiring assessment.</p>
+          ${r.flags.map(f => `<div class="flag">${esc(f)}</div>`).join('')}
+          <div class="ctas"><button class="btn lime" id="again"><i class="ph ph-repeat"></i>Drill again</button><button class="tlink" id="full">Play a full round</button></div></div>
+          <div class="rise d1"><div class="tile mint wkt"><span class="chip2"><i class="ph ph-${ICON[dim.id]}"></i></span><span class="k">${passed ? 'What you did' : 'What to add'}</span><h2>${esc(dim.name)}</h2>
+            ${(passed ? dim.found : dim.missing).length ? `<ul class="chk">${(passed ? dim.found : dim.missing).map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p>Nothing specific to report.</p>'}
+            ${!passed && dim.fix ? `<p><b>For this case:</b> ${esc(dim.fix)}</p>` : ''}</div>
+            ${passed && dim.missing.length ? `<div class="share"><h3>Still missing</h3><ul class="chk">${dim.missing.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+          </div></div></section>
+      ${footerHtml()}</div>`;
+    document.getElementById('again').onclick = () => startDrill(dim.id);
+    document.getElementById('full').onclick = home;
+    countUp(); window.scrollTo(0, 0); if (passed) burst();
   }
 
   /* ---------- progress ---------- */
@@ -865,7 +923,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
     const rows = avgs.map((x, i) => `<div class="avg ${i === 0 ? 'wk' : ''}"><span class="nm"><span class="di"><i class="ph ph-${ICON[x.d.id]}"></i></span><b>${x.d.name}</b>${i === 0 && avgs.length > 1 ? '<span class="tagw">weakest on average</span>' : ''}</span><b class="sc">${x.avg}</b><i class="ln" style="width:${Math.max(3, x.avg)}%"></i></div>`).join('');
     const recent = h.slice(-8).reverse().map(e => `<details class="dim"><summary><span class="nm"><span class="di"><i class="ph ph-clock-counter-clockwise"></i></span><span><b>${esc(e.title)}</b> <span class="w">${new Date(e.ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, weakest: ${esc(dimName(e.weakest))}</span></span></span><b class="sc">${e.overall}</b></summary>
         <p class="ans">${esc(e.answer || '')}</p></details>`).join('');
-    return `<section class="sec cols" id="progress"><div><h2>Your progress</h2><p class="lead">From your last ${h.length} scored ${h.length === 1 ? 'round' : 'rounds'}, stored on this device only.</p><p style="margin-top:16px"><button class="btn ghost" id="clearhist"><i class="ph ph-trash"></i>Clear history</button></p></div>
+    return `<section class="sec cols" id="progress"><div><h2>Your progress</h2><p class="lead">From your last ${h.length} scored ${h.length === 1 ? 'round' : 'rounds'}, stored on this device only.</p><p style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">${avgs.length ? `<button class="btn lime" id="drillavg" data-dim="${avgs[0].d.id}"><i class="ph ph-barbell"></i>Drill ${esc(avgs[0].d.name.toLowerCase())}</button>` : ''}<button class="btn ghost" id="clearhist"><i class="ph ph-trash"></i>Clear history</button></p>${(store.drills || []).length ? `<p class="note2" style="margin-top:12px">${store.drills.length} ${store.drills.length === 1 ? 'drill' : 'drills'} done, ${store.drills.filter(d => d.score >= 70).length} passed.</p>` : ''}</div>
       <div><div class="sparkbox">${svg}</div><div class="avgs">${rows}</div><h3 style="margin-top:32px">Recent rounds</h3><div class="dims" style="margin-top:8px">${recent}</div></div></section>`;
   }
   function practiceHtml() {

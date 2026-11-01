@@ -49,7 +49,8 @@ Share of five signals found, with four of five earning full marks. Signals: defi
 Only the asking sentences are matched against the topics, so mentioning "regulation" in a statement does not count as asking about it.
 
 ### Segmentation
-- 75%: how many different cuts you name, with four earning full marks: platform or device, geography, new vs existing or cohort, acquisition channel, persona or user type, plan or value tier, behavior or engagement.
+- 50%: how many different cuts you name, with four earning full marks: platform or device, geography, new vs existing or cohort, acquisition channel, persona or user type, plan or value tier, behavior or engagement.
+- 25%: explicit segmentation language ("I would cut it by", "segment", "break it down", "by platform"). Mentioning a platform in passing, for example inside a question, does not earn this.
 - 25%: you said which segment to look at or start with.
 
 ### Hypothesis quality
@@ -58,6 +59,8 @@ Only the asking sentences are matched against the topics, so mentioning "regulat
 - 25%: a way to test it (validate, experiment, A/B, compare, holdout).
 - 30%: **breadth of case-specific causes** considered, with three earning full marks. The categories depend on the case type (see below).
 - 15%: what you would expect to see if it is true or false.
+
+Only **statements** count here, not questions, so asking "what shipped around then?" does not count as proposing a cause. The causal, testing and expectation signals are read from hypothesis-like sentences (those with a hypothesis phrase or a cause term), so a "because" in your framing does not earn credit.
 
 ### Metrics
 - 25%: at least three distinct named metrics (retention, conversion, activation, CAC, and so on).
@@ -68,8 +71,8 @@ Only the asking sentences are matched against the topics, so mentioning "regulat
 
 ### Prioritization
 - 30%: at least two explicit criteria (impact, effort, confidence, reach, RICE, risk).
-- 20%: a ranked order or sequence.
-- 25%: something explicitly cut or deferred, or a trade-off named.
+- 20%: a ranked order or sequence, in explicit language (rank, prioritize, start with, in order, "first ..., then ..."). A bare "then" or "next steps" does not count.
+- 25%: something explicitly cut or deferred, or a trade-off named (defer, cut, not build, trade-off, opportunity cost).
 - 10%: dependencies or constraints.
 - 15%: a decisive recommendation ("I would", "I recommend").
 
@@ -106,6 +109,21 @@ Guards multiply every dimension score, so they stack.
 | 30 or more words and none of the case's key terms appear | x 0.5 (off topic) |
 
 The off-topic check uses terms taken from the case itself, such as the country in a launch case or the feature names in a prioritization case, so an answer written for a different case is penalised.
+
+## Drills
+
+Each dimension has a 3-minute drill: a fresh case, a checklist of what the scorer looks for in that one dimension, and only that dimension scored. A drill passes at 70. Drills count toward the daily streak but not toward history averages or the leaderboard. The checklists live in `DRILLS` in `engine.js`.
+
+## Calibration
+
+`test/calibration.test.js` guards the scoring against silent drift. For two fixed cases (one diagnostic, one not) it builds a strong answer from one block per dimension, then:
+
+- checks that the complete answer scores 80 or more with no flags;
+- removes each block in turn and requires that dimension's score to drop by at least 20 points and the overall score to fall;
+- checks that a partial answer sits between a vague one and the complete one;
+- checks that removing the hypothesis or metrics block makes it the biggest weakness.
+
+This test exposed signals that were too easy to satisfy by accident (passing mentions, generic words like "then" and "next"), which is why the segmentation, hypothesis and prioritization rules above are strict about context. When you change a signal, run `npm test`, and add a block or a case if you add a new behavior.
 
 ## Limits
 

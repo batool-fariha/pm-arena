@@ -34,7 +34,7 @@ See [docs/deploying.md](docs/deploying.md) to run the API too.
 
 1. Edit the dimension in `scoreAnswer`.
 2. Add a test in `test/engine.test.js` with an answer that shows the change in behavior.
-3. Check the effect on a strong and a weak sample answer, so scores do not drift up for everyone.
+3. Run `npm test`. The calibration suite removes each dimension's block from a strong answer and requires that dimension to drop, so a signal that is too easy to satisfy will fail it. Check the effect on a strong and a weak sample answer, so scores do not drift up for everyone.
 4. Update `docs/scoring.md`.
 
 ## Pull requests

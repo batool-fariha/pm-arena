@@ -15,6 +15,7 @@ Practice product management interview cases against the clock, by voice or text.
 - **A timed round:** 5, 10 or 15 minutes, typed or dictated. Time running out submits what you have.
 - **A critique that points at one thing:** seven scores, what the scorer found and missed in each, a fix written for that case, and the biggest weakness.
 - **Follow-up questions** an interviewer could ask about your three weakest areas.
+- **Drills:** a 3-minute round on one dimension, with a checklist of what the scorer looks for. Start one from your result or your progress.
 - **Progress on your device:** score trend, average per dimension, recent rounds with your answers, daily streak.
 - **Optional extras:** a shared leaderboard and AI coach notes (see [Privacy at a glance](#privacy-at-a-glance)).
 
@@ -102,6 +103,7 @@ vercel.json         function settings
 - [Scoring rubric](docs/scoring.md): every signal, weight, guard and limit
 - [Architecture and API](docs/architecture.md): data flow, endpoints, stored data, security model
 - [Deploying](docs/deploying.md): run the API locally, deploy your own copy
+- [Device test checklist](docs/device-checklist.md): what to verify on real phones and browsers
 - [Contributing](CONTRIBUTING.md): adding case types and scoring signals, tests, pull requests
 - [Security](SECURITY.md): reporting a problem
 
@@ -112,7 +114,7 @@ npm install
 npm test
 ```
 
-Covers the scoring engine and the validation applied to AI coach replies. CI runs them on every push.
+Covers the scoring engine, a calibration suite that catches drift in the heuristics (see [docs/scoring.md](docs/scoring.md#calibration)), and the validation applied to AI coach replies. CI runs them on every push.
 
 ## Ideas, not promises
 

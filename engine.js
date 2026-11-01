@@ -508,6 +508,23 @@
   };
   function followUps(dimId) { return (FOLLOWUPS[dimId] || []).slice(); }
 
+  /* Drill mode: a short round focused on one dimension. */
+  const DRILLS = {
+    framing: { focus: 'Spend the whole round on framing the problem.', checklist: ['State the goal or the decision in one sentence', 'Say why it matters to the business', 'Name one or two assumptions you are making', 'Announce your approach in steps', null] },
+    clarify: { focus: 'Ask the questions you would need answered before you commit to anything.', checklist: ['Ask at least four questions, each about a different topic', 'Ask them first, before any analysis', 'Say briefly why each answer would change your plan'] },
+    segmentation: { focus: 'Cut the problem up. Do not propose solutions yet.', checklist: ['Say it out loud: "I would cut it by ..."', 'Name at least four different cuts (platform, geography, new vs existing, channel, user type, plan, behavior)', 'Say which cut you would look at first and why', 'Say what result would make you switch to another cut'] },
+    hypothesis: { focus: 'Write three competing hypotheses and how you would test each.', checklist: ['Phrase each as "I believe X because Y"', 'Cover at least three different causes', 'For each, say how you would test it', 'Say what you would expect to see if it is true'] },
+    metrics: { focus: 'Define the metrics only. Skip the diagnosis and the plan.', checklist: ['Name a primary metric and two supporting metrics', 'Name a guardrail that must not get worse', 'Separate leading from lagging metrics', 'Give a baseline and a target with numbers', 'Say how long you would measure'] },
+    prioritization: { focus: 'Rank your options and say what you would not do.', checklist: ['Use at least two criteria, such as impact and effort', 'Give an explicit order: "start with ..., then ..."', 'Say what you would defer or not do', 'Make a clear recommendation: "I would ..."', 'Mention one dependency or constraint'] },
+    communication: { focus: 'Answer in a shape someone could follow out loud.', checklist: ['Lead with the recommendation', 'Use labelled parts or numbered steps', 'Keep sentences short', 'End with next steps, an owner and a date', 'Aim for 120 to 250 words'] },
+  };
+  function drillInfo(dimId, diagnostic) {
+    const d = DRILLS[dimId]; if (!d) return null;
+    const extra = diagnostic ? 'Say how you would check the data is real before diagnosing' : 'Name the options you would compare';
+    return { focus: d.focus, checklist: d.checklist.map((x) => (x === null ? extra : x)) };
+  }
+  function driverLabels(c) { return (DRIVERS[c.drivers] || []).map((x) => x.label); }
+
   function band(n) {
     if (n >= 90) return 'Very strong signals';
     if (n >= 75) return 'Strong structure';
@@ -516,7 +533,7 @@
     return 'Early draft';
   }
 
-  const api = { TYPES, CLARIFY, generateCase, scoreAnswer, band, DIMS, rebuildCase, followUps };
+  const api = { TYPES, CLARIFY, generateCase, scoreAnswer, band, DIMS, rebuildCase, followUps, drillInfo, driverLabels };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Arena = api;
 })(typeof window !== 'undefined' ? window : globalThis);

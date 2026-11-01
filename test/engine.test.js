@@ -84,3 +84,19 @@ test('AI notes: invented quotes are dropped, bad dimensions rejected, lists capp
   assert.equal(validate({ biggest_weakness: { dimension: 'nope' } }, answer), null);
   assert.equal(validate(null, answer), null);
 });
+
+test('every dimension has a drill with a complete checklist', () => {
+  for (const d of A.DIMS) {
+    for (const diagnostic of [true, false]) {
+      const info = A.drillInfo(d.id, diagnostic);
+      assert.ok(info && info.focus, d.id);
+      assert.ok(info.checklist.length >= 3, d.id);
+      assert.ok(info.checklist.every((x) => typeof x === 'string' && x.length > 5), `${d.id} has an empty checklist item`);
+    }
+  }
+  assert.equal(A.drillInfo('nope'), null);
+});
+
+test('hypothesis drill hints exist for every case type', () => {
+  for (const t of A.TYPES) assert.ok(A.driverLabels(A.generateCase(t.id)).length >= 5, t.id);
+});
