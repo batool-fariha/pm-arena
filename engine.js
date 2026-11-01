@@ -355,21 +355,27 @@
     {
       const hit = SEGMENTS.filter((x) => x.re.test(text));
       const act = /(prioriti[sz]e|focus on|target|start with|beachhead|double down|biggest|most (affected|impacted|valuable))/.test(text);
+      const explicit = /(segment|\bcut (it|this|the \w+) by|\bcut by|break (it|this|them) down|slice|split (it |this )?by|by (platform|cohort|channel|geograph|region|device|plan|persona)|cohort analysis)/.test(text);
       out.segmentation = {
-        score: (0.75 * clamp(hit.length / 4) + 0.25 * (act ? 1 : 0)) * 100,
+        score: (0.5 * clamp(hit.length / 4) + 0.25 * (explicit ? 1 : 0) + 0.25 * (act ? 1 : 0)) * 100,
         found: hit.length ? ['Cuts mentioned: ' + hit.map((x) => x.label).join(', ')] : [],
         missing: SEGMENTS.filter((x) => !x.re.test(text)).slice(0, 3).map((x) => 'No cut by ' + x.label)
+          .concat(explicit ? [] : ['You mentioned cuts in passing but never said you would segment the problem (for example "I would cut it by ...").'])
           .concat(act ? [] : ['Segments were listed but you never said which one matters most or to start with.']),
       };
     }
 
     /* Hypothesis quality */
     {
-      const marker = /(hypothes|my guess|likely|suspect|could be|might be|one possibility|i believe|we believe|bet)/.test(text);
-      const because = /(because|due to|driven by|caused by|leads to|which would|so that)/.test(text);
-      const testable = /(validate|test|experiment|a\/b|compare|check|look at|query|confirm|rule out|falsif|cohort analysis|holdout)/.test(text);
-      const evidence = /(we would expect|should see|would show|signal|evidence|if (this|that) is (true|right)|if so|if not)/.test(text);
-      const causes = D.filter((x) => x.re.test(text));
+      const markerRe = /(hypothes|my guess|\blikely\b|suspect|could be|might be|one possibility|i believe|we believe|\bbet\b)/;
+      const statements = text.split(/(?<=[.!?])\s+|\n+/).filter((q) => !/\?|^\s*(what|when|where|which|who|how|why|is|are|does|do|did|can|could|will|would)\b/.test(q));
+      const stmtText = statements.join(' ');
+      const hypText = statements.filter((q) => markerRe.test(q) || D.some((x) => x.re.test(q))).join(' ');
+      const marker = markerRe.test(stmtText);
+      const because = /(because|due to|driven by|caused by|leads to|which would|so that)/.test(hypText);
+      const testable = /(validate|test|experiment|a\/b|compare|check|look at|query|confirm|rule out|falsif|cohort analysis|holdout)/.test(hypText);
+      const evidence = /(we would expect|should see|would show|signal|evidence|if (this|that) is (true|right)|if true|if so|if not|should (stay|be|remain))/.test(hypText);
+      const causes = D.filter((x) => x.re.test(stmtText));
       const target = c.diagnostic ? 3 : 3;
       out.hypothesis = {
         score: (0.15 * marker + 0.15 * because + 0.25 * testable + 0.3 * clamp(causes.length / target) + 0.15 * evidence) * 100,
@@ -381,7 +387,7 @@
           .concat(because ? [] : ['No causal reasoning (the "because").'])
           .concat(testable ? [] : ['No way to validate or falsify the hypothesis.'])
           .concat(evidence ? [] : ['Did not say what you would expect to see if the hypothesis is true or false.'])
-          .concat(D.filter((x) => !x.re.test(text)).slice(0, 3).map((x) => 'Did not consider: ' + x.label)),
+          .concat(D.filter((x) => !x.re.test(stmtText)).slice(0, 3).map((x) => 'Did not consider: ' + x.label)),
       };
     }
 
@@ -407,9 +413,9 @@
 
     /* Prioritization */
     {
-      const crit = uniq(text.match(/\b(rice|ice|impact|effort|confidence|reach|cost of delay|moscow|kano|expected value|likelihood|urgency|risk)\b/g) || []);
-      const rank = /(#1|\b1[.)]|first priority|top priority|prioriti[sz]e|\brank|\bp0\b|\bp1\b|do first|start with|sequenc|roadmap|then\b|next\b)/.test(text);
-      const cut = /(trade-?off|not (do|build|ship)|defer|deprioriti|\bcut\b|descope|won't|out of scope|later|opportunity cost|not now)/.test(text);
+      const crit = uniq(text.match(/\b(rice|ice|impact|effort|confidence|reach|cost of delay|moscow|kano|expected value|likelihood|urgency)\b/g) || []);
+      const rank = /(#1|\b1[.)]|first priority|top priority|prioriti[sz]e|\brank|\bp0\b|\bp1\b|do first|start with|sequenc|roadmap|in order|before we|first[, ][^.]{0,80}\b(then|next|after that)\b)/.test(text);
+      const cut = /(trade-?off|not (do|build|ship)|defer|deprioriti|\bcut\b|descope|won't|out of scope|opportunity cost|not now)/.test(text);
       const dep = /(depend|risk|constraint|capacity|resourc|timeline|quarter|sprint)/.test(text);
       const decisive = /(i (would|recommend|'d)|we should|recommend|my pick|my decision|go with|the answer is)/.test(text);
       out.prioritization = {
