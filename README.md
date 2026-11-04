@@ -38,6 +38,10 @@
 
 ![PM Arena on a phone: the home screen with the scoring card, a case with its timer, and a result with the biggest weakness](docs/images/mobile.png)
 
+**Drill mode** turns a weakness into practice: a 3-minute round on one dimension, with a checklist of exactly what the scorer looks for.
+
+![A drill in progress: the Metrics checklist at the top left, the case below it, and a drafted answer with a countdown on the right](docs/images/drill.png)
+
 ## How a round works
 
 1. **Set up.** Choose a time limit and a case type (or leave it random) and press **Start round**.

@@ -5,7 +5,7 @@ All notable changes are listed here, newest first. The format follows [Keep a Ch
 ## 2026-11-05
 
 ### Added
-- Hero, result and phone screenshots in the README, a critique screenshot in the user guide, and `scripts/capture-screenshots.js` to regenerate them.
+- Hero, result, phone and drill screenshots in the README, critique and drill screenshots in the user guide, and `scripts/capture-screenshots.js` to regenerate all of them.
 
 ### Fixed
 - Pill-shaped button groups ("Set up a round", "New case") stack at full width on phones instead of wrapping unevenly.

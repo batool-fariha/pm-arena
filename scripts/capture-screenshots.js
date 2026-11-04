@@ -3,7 +3,9 @@
      hero.png      the home page
      result.png    the result screen after a scripted round
      critique.png  the expanded critique list
-     mobile.png    home, case and result on a phone, side by side
+     drill.png         a drill in progress (checklist, case, drafted answer)
+     drill-result.png  the result of a passed drill
+     mobile.png        home, case and result on a phone, side by side
 
    Usage:
      npm i --no-save playwright-core
@@ -21,6 +23,9 @@ const EXE = process.env.CHROME_PATH;
 if (!EXE) { console.error('Set CHROME_PATH to a Chromium or chrome-headless-shell binary.'); process.exit(1); }
 
 /* A realistic answer with a few gaps, so the result shows a mid score and a clear weakness. */
+/* A metrics-focused drill answer for the retention case. */
+const DRILL_ANSWER = `The primary metric is D30 retention by weekly signup cohort, with a baseline of 38% and a target of 36% recovery within two weeks. Supporting metrics are week-one sessions, which is a leading indicator, and onboarding activation rate. Guardrails: new-user volume and support tickets must not get worse. I would measure for four weeks against a holdout cohort, because retention is a lagging metric and moves slowly.`;
+
 const ANSWER = `Questions first: when exactly did it start, and was it sudden or gradual? Does it hit all platforms or only one? How is D30 retention defined, and did tracking change?
 The goal is to find out whether this drop is real and recover it within two weeks. I will assume tracking is correct until I verify the data.
 I think the paid campaign brought in lower-intent users because volume rose while retention fell, so I would compare retention across channels. It could also be the recent redesign hurting onboarding.
@@ -61,6 +66,26 @@ I would rank the causes by effort and start with the channel comparison, then lo
 
   const info = await page.evaluate(() => ({ score: document.querySelector('.ring .num b').textContent, weakest: document.querySelector('.wkt h2').textContent }));
 
+  // Drill: start one from the result. A drill draws a random case, so pin Math.random
+  // for that one call to get the first case (a retention case) every time.
+  await page.evaluate(() => { window.__random = Math.random; Math.random = () => 0; });
+  await page.click('#drillw');
+  await page.waitForSelector('.drillbar');
+  await page.evaluate(() => { Math.random = window.__random; });
+  const dim = await page.textContent('.drillbar h3');
+  if (dim.trim() !== 'Metrics') console.warn(`Warning: the drill is for "${dim.trim()}" but the scripted answer is about metrics.`);
+  await page.waitForTimeout(1500);
+  await page.fill('#ans', DRILL_ANSWER);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: path.join(OUT, 'drill.png'), clip: { x: 0, y: 0, width: 1440, height: 940 } });
+  await page.click('#submit');
+  await page.waitForSelector('#again');
+  await page.waitForTimeout(3500);
+  await page.evaluate(() => { document.querySelectorAll('.confetti').forEach((e) => e.remove()); window.scrollTo(0, 0); });
+  const drill = await page.evaluate(() => ({ verdict: document.querySelector('.rleft h2').textContent, score: document.querySelector('.ring .num b').textContent }));
+  if (drill.verdict !== 'Drill passed') console.warn(`Warning: the drill result says "${drill.verdict}" (${drill.score}); the scripted answer should pass.`);
+  await page.screenshot({ path: path.join(OUT, 'drill-result.png'), clip: { x: 0, y: 0, width: 1440, height: 740 } });
+
   // Mobile: three phone-sized screens, composed into one image with simple frames.
   const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })).newPage();
   await phone.goto(URL, { waitUntil: 'networkidle' });
@@ -92,6 +117,6 @@ I would rank the causes by effort and start with the channel comparison, then lo
     figcaption{margin-top:18px}</style><div class="row">${figures}</div>`);
   await sheet.screenshot({ path: path.join(OUT, 'mobile.png'), fullPage: true });
 
-  console.log(`Wrote hero.png, result.png, critique.png and mobile.png to ${OUT} (score ${info.score}, weakest ${info.weakest}).`);
+  console.log(`Wrote hero.png, result.png, critique.png, drill.png, drill-result.png and mobile.png to ${OUT} (score ${info.score}, weakest ${info.weakest}).`);
   await browser.close();
 })().catch((e) => { console.error('Capture failed:', e.message); process.exit(1); });

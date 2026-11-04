@@ -58,6 +58,12 @@ A drill is a 3-minute round on one dimension.
 - Write 60 to 150 words about the case shown (120 to 250 for Communication). Only that dimension is scored.
 - A drill passes at 70. Drills count toward your streak, but not toward your history averages or the leaderboard.
 
+![A drill in progress: the Metrics checklist at the top left, the case below it, and a drafted answer with a countdown on the right](images/drill.png)
+
+After you submit, the result shows your drill score next to your average in that dimension, and what you did or what to add. **Drill again** gives you a fresh case.
+
+![A passed drill: a score of 100 for Metrics, with what the scorer found listed beside it](images/drill-result.png)
+
 ## Voice dictation
 
 Press **Dictate**, allow the microphone when asked, and speak. Your words appear in the answer box and you can edit them before submitting. Basic punctuation is added, and sentences that start like a question end with a question mark.
