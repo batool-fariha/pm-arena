@@ -175,7 +175,7 @@ h1 .soft{color:#7c8194}
 .play{position:relative;background:#fff;border:1px solid var(--line);border-radius:28px;padding:26px;box-shadow:0 30px 60px -40px rgba(13,14,18,.25)}
 .sticker{position:absolute;top:-14px;right:20px;transform:rotate(3deg);background:var(--mint-soft);border:1px solid #b7f2da;color:var(--mint-ink);font-weight:600;font-size:.8rem;border-radius:999px;padding:6px 12px;display:flex;gap:6px;align-items:center;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
 .play:hover .sticker{transform:rotate(-2deg) translateY(-2px)}
-.phead{display:flex;justify-content:space-between;color:var(--mute);font-size:.9rem}
+.phead{display:flex;justify-content:space-between;flex-wrap:wrap;gap:2px 12px;color:var(--mute);font-size:.9rem}.phead span{white-space:nowrap}
 .phead b{font-size:1.05rem;color:var(--ink);font-weight:600}
 .ptotal{display:flex;align-items:baseline;gap:8px;margin-top:8px}
 .ptotal b{font:500 4.6rem/1 var(--m);letter-spacing:-.06em}
@@ -187,9 +187,11 @@ h1 .soft{color:#7c8194}
 .pn i{color:var(--accent);font-size:1.1rem;flex:none}
 .pr.wk .pn{color:var(--ink);font-weight:600}
 .pr output{font:600 .9rem var(--m);text-align:right}
-.pr input{--p:50%;-webkit-appearance:none;appearance:none;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--ink) var(--p),#e4e6ee var(--p));width:100%;margin:0;cursor:pointer}
-.pr input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--mint);border:2px solid var(--ink);transition:transform .15s}
-.pr input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--mint);border:2px solid var(--ink)}
+.pr input{--p:50%;-webkit-appearance:none;appearance:none;height:30px;background:transparent;width:100%;margin:0;cursor:pointer;touch-action:pan-y}
+.pr input::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(90deg,var(--ink) var(--p),#e4e6ee var(--p))}
+.pr input::-moz-range-track{height:4px;border-radius:4px;background:linear-gradient(90deg,var(--ink) var(--p),#e4e6ee var(--p))}
+.pr input::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-9px;border-radius:50%;background:var(--mint);border:2px solid var(--ink);transition:transform .15s}
+.pr input::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--mint);border:2px solid var(--ink)}
 .pr input:active::-webkit-slider-thumb{transform:scale(1.25)}
 .pr input:focus-visible{outline:3px solid var(--accent);outline-offset:6px}
 .pweak{display:flex;gap:10px;align-items:center;margin-top:12px;background:#f4f5f9;border-radius:16px;padding:12px 14px;font-weight:500}
@@ -202,7 +204,7 @@ h1 .soft{color:#7c8194}
 .step:hover .bi{transform:translateY(-3px) rotate(-6deg);background:var(--mint)}
 .step h3{font-size:1.25rem}
 .step p{color:var(--mute);margin-top:4px;max-width:28ch}
-@media (max-width:860px){.hero{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.ptotal b{font-size:3.8rem}.pr{grid-template-columns:118px 1fr 28px;font-size:.8rem}.pn{white-space:normal;line-height:1.2}.pn i{display:none}}
+@media (max-width:860px){.hero{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.ptotal b{font-size:3.8rem}.pr{grid-template-columns:1fr 34px;gap:0 12px;padding:8px 8px 4px;font-size:.9rem}.pr .pn{grid-column:1;grid-row:1;white-space:normal;line-height:1.2}.pr output{grid-column:2;grid-row:1}.pr input{grid-column:1/3;grid-row:2}}
 
 /* editorial flow */
 /* flat, crisp background */
@@ -252,10 +254,10 @@ body::before{display:none}
 .stage{margin-top:6px;background:#f1f3f6;border-radius:48px;padding:clamp(44px,7vw,88px) clamp(16px,4vw,56px) clamp(44px,6vw,80px);text-align:center;position:relative;overflow:hidden;isolation:isolate}
 .stage h1{font-size:clamp(2.6rem,6.6vw,5.8rem);line-height:.98;letter-spacing:-.05em;font-weight:500}
 .stage .lead{margin:20px auto 0;text-align:center;max-width:44ch}
-.ctas{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px;margin-top:30px;box-shadow:0 10px 30px -18px rgba(13,14,18,.3)}
+.ctas{display:inline-flex;flex-wrap:wrap;max-width:100%;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px;margin-top:30px;box-shadow:0 10px 30px -18px rgba(13,14,18,.3)}
 .btn.lime{background:var(--mint);border-color:var(--mint);color:var(--ink);font-weight:600}
 .btn.lime:hover{box-shadow:0 0 0 4px rgba(53,224,165,.35)}
-.tlink{font:500 1rem var(--f);color:var(--ink);text-decoration:none;padding:13px 20px;border-radius:999px}
+.tlink{font:500 1rem var(--f);color:var(--ink);text-decoration:none;padding:13px 20px;border-radius:999px;white-space:nowrap}
 .tlink:hover{background:#f1f3f6}
 .scene{position:relative;display:grid;grid-template-columns:1fr minmax(340px,420px) 1fr;gap:clamp(24px,5vw,72px);margin-top:64px;text-align:left;align-items:stretch}
 .scene .col{display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:10px 0;position:relative;z-index:2}
@@ -369,6 +371,10 @@ blockquote{margin:10px 0 0;padding-left:14px;border-left:3px solid var(--mint);c
 .dn q{color:var(--mute);font-style:italic}
 .stronger{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
 .stronger p{margin-top:6px;font-size:1.05rem}
+/* touch targets */
+.logo{min-height:44px}
+.foot a.u{display:inline-block;padding:8px 0}
+@media (max-width:860px){.hint{min-height:42px;padding:9px 14px}.seg button{min-height:42px}.soc a{width:48px;height:48px}}
 /* fun layer */
 .btn.primary:hover{box-shadow:0 0 0 4px rgba(53,224,165,.4),0 14px 34px -12px rgba(13,14,18,.6)}
 .btn.accent:hover{box-shadow:0 0 0 4px rgba(53,224,165,.45),0 14px 34px -12px rgba(36,87,255,.7)}
@@ -872,7 +878,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
     return `<div class="drillbar"><span class="chip3">Drill, 3 minutes</span><h3>${esc(name)}</h3><p>${esc(info.focus)}</p>
       <p style="margin-top:10px"><b>What the scorer looks for</b></p><ul class="chk">${info.checklist.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
       ${hints ? `<details class="hintbox"><summary>Show hints</summary>${hints}</details>` : ''}
-      <p class="note2">Write about the case on this page, in 60 to 150 words. Only ${esc(name.toLowerCase())} is scored in a drill.</p></div>`;
+      <p class="note2">Write about the case on this page, in ${state.drill === 'communication' ? '120 to 250' : '60 to 150'} words. Only ${esc(name.toLowerCase())} is scored in a drill.</p></div>`;
   }
   function submitDrill(auto) {
     const res = A.scoreAnswer(state.answer, state.c), dim = res.dims.find(d => d.id === state.drill);
