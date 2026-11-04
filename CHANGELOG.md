@@ -1,8 +1,17 @@
 # Changelog
 
-All notable changes are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project has no tagged releases yet, so entries are grouped by date.
+All notable changes are listed here, newest first. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Releases follow [Semantic Versioning](https://semver.org/) (see [CONTRIBUTING.md](CONTRIBUTING.md#versioning-and-releases)). Work before the first tag is grouped by date.
 
-## 2026-11-05
+## Unreleased
+
+Nothing yet.
+
+## [1.0.0] - 2026-11-05
+
+The first tagged release. Everything below this heading, back to 2026-10-11, was built before tagging and is kept as dated history.
+
+### Security
+- Updated patched transitive dependencies of `@vercel/blob` (`undici`, `zod`) so `npm audit --omit=dev` reports no known vulnerabilities.
 
 ### Added
 - Hero, result, phone and drill screenshots in the README, critique and drill screenshots in the user guide, and `scripts/capture-screenshots.js` to regenerate all of them.
@@ -62,3 +71,5 @@ Scores on the sample answers moved by 3 points or less.
 
 ### Added
 - First release: random case generation, timed rounds, voice dictation, seven-dimension heuristic scoring with a critique and a single biggest weakness, a shareable result (text and image), daily streak, a device leaderboard, MIT license and a source link in the footer. Deployed on Vercel.
+
+[1.0.0]: https://github.com/batool-fariha/pm-arena/releases/tag/v1.0.0

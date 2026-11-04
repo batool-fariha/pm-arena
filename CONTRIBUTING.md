@@ -45,6 +45,18 @@ See [docs/deploying.md](docs/deploying.md) to run the API too.
 - Add a line to the top of [CHANGELOG.md](CHANGELOG.md) for anything a user would notice, and update the docs that describe the behavior.
 - UI changes: check phone width and keyboard use, and respect `prefers-reduced-motion`.
 
+## Versioning and releases
+
+Releases follow [Semantic Versioning](https://semver.org/), applied to what a player can observe:
+
+| Bump | When |
+|---|---|
+| **Patch** (1.0.x) | Bug fixes, copy and layout fixes, dependency updates, and scoring fixes that move sample scores by only a few points |
+| **Minor** (1.x.0) | New features such as case types or modes, and rubric changes that noticeably move scores |
+| **Major** (x.0.0) | Breaking changes to the leaderboard or any stored data, or to the `/api` request and response shapes |
+
+To cut a release, move the **Unreleased** notes in `CHANGELOG.md` under a new version heading, run `npm version <x.y.z> --no-git-tag-version`, merge, and create a GitHub Release with the same notes. Contributors only need to add a line under **Unreleased**.
+
 ## Updating the screenshots
 
 `docs/images/` holds six captures of the live site (`hero.png`, `result.png`, `critique.png`, `drill.png`, `drill-result.png`, `mobile.png`), used by the README and the user guide. Regenerate them after a visual change with the script, which plays a scripted round and never posts to the leaderboard:
