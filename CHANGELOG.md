@@ -4,6 +4,9 @@ All notable changes are listed here, newest first. The format follows [Keep a Ch
 
 ## 2026-11-05
 
+### Added
+- Hero screenshot in the README, and instructions for refreshing it in CONTRIBUTING.
+
 ### Fixed
 - Phone layout: the hero sliders are full width with a 30px touch area and larger thumbs, instead of a 63px-wide strip.
 - Tap targets for the logo, section-starter chips, toggles, footer icons and author link, and the drill hints toggle now meet comfortable sizes.

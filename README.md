@@ -7,6 +7,8 @@
 
 **Live:** https://pm-arena-phi.vercel.app
 
+[![PM Arena home page: a headline, a scoring card with seven adjustable dimension sliders, and floating tiles connected to it](docs/images/hero.png)](https://pm-arena-phi.vercel.app)
+
 > **Scores are heuristic assessments of how a written answer matches common PM-answer patterns (structure, keywords, specificity). They are not hiring assessments and do not predict interview outcomes.**
 
 ## Contents

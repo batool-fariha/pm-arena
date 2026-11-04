@@ -45,6 +45,19 @@ See [docs/deploying.md](docs/deploying.md) to run the API too.
 - Add a line to the top of [CHANGELOG.md](CHANGELOG.md) for anything a user would notice, and update the docs that describe the behavior.
 - UI changes: check phone width and keyboard use, and respect `prefers-reduced-motion`.
 
+## Updating the README screenshot
+
+`docs/images/hero.png` is a capture of the live home page. Recapture it after a visual change, for example with a headless Chromium (Playwright's works):
+
+```bash
+chrome-headless-shell --headless --hide-scrollbars --force-device-scale-factor=2 \
+  --window-size=1440,1400 --virtual-time-budget=9000 \
+  --screenshot=docs/images/hero.png https://pm-arena-phi.vercel.app/
+sips --resampleWidth 1800 docs/images/hero.png --out docs/images/hero.png   # macOS; keeps the file near 800 KB
+```
+
+Look at the result before committing: the whole scoring card and the ticker should be in frame.
+
 ## Reporting bugs
 
 Open an issue with the case type, your answer (if relevant), what you expected and what you saw. For security problems see [SECURITY.md](SECURITY.md) instead.
