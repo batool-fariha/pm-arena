@@ -34,6 +34,9 @@
 - **Drills:** a 3-minute round on one dimension, with a checklist of what the scorer looks for.
 - **Progress on your device:** score trend, average per dimension, recent rounds with your answers, and a daily streak.
 - **Optional, opt-in extras:** a shared leaderboard, and AI coach notes that quote what you wrote.
+- **Phone friendly:** full-width sliders, large tap targets and stacked buttons at phone widths. Checked in an emulated phone view; the [device checklist](docs/device-checklist.md) covers real devices.
+
+![PM Arena on a phone: the home screen with the scoring card, a case with its timer, and a result with the biggest weakness](docs/images/mobile.png)
 
 ## How a round works
 

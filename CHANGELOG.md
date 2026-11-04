@@ -5,9 +5,10 @@ All notable changes are listed here, newest first. The format follows [Keep a Ch
 ## 2026-11-05
 
 ### Added
-- Hero and result screenshots in the README, a critique screenshot in the user guide, and `scripts/capture-screenshots.js` to regenerate them.
+- Hero, result and phone screenshots in the README, a critique screenshot in the user guide, and `scripts/capture-screenshots.js` to regenerate them.
 
 ### Fixed
+- Pill-shaped button groups ("Set up a round", "New case") stack at full width on phones instead of wrapping unevenly.
 - Phone layout: the hero sliders are full width with a 30px touch area and larger thumbs, instead of a 63px-wide strip.
 - Tap targets for the logo, section-starter chips, toggles, footer icons and author link, and the drill hints toggle now meet comfortable sizes.
 - Button labels no longer wrap in the call-to-action groups, and the scoring card header no longer wraps awkwardly.

@@ -47,14 +47,14 @@ See [docs/deploying.md](docs/deploying.md) to run the API too.
 
 ## Updating the screenshots
 
-`docs/images/` holds three captures of the live site (`hero.png`, `result.png`, `critique.png`), used by the README and the user guide. Regenerate them after a visual change with the script, which plays a scripted round and never posts to the leaderboard:
+`docs/images/` holds four captures of the live site (`hero.png`, `result.png`, `critique.png`, `mobile.png`), used by the README and the user guide. Regenerate them after a visual change with the script, which plays a scripted round and never posts to the leaderboard:
 
 ```bash
 npm i --no-save playwright-core
 CHROME_PATH=/path/to/chromium-or-chrome-headless-shell node scripts/capture-screenshots.js
 ```
 
-Playwright's own Chromium works (`npx playwright install chromium` downloads it). Set `URL` to capture a local or preview deployment instead of the live site. Look at the three files before committing: the whole scoring card and the ticker should be in frame, and the result should show a mid-range score with the biggest weakness expanded.
+Playwright's own Chromium works (`npx playwright install chromium` downloads it). Set `URL` to capture a local or preview deployment instead of the live site. Look at the three files before committing: the whole scoring card and the ticker should be in frame, the result should show a mid-range score with the biggest weakness expanded, and the phone image should show an on-topic result (a warning about the case means the scripted answer no longer matches it).
 
 ## Reporting bugs
 
