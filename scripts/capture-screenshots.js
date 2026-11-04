@@ -3,6 +3,7 @@
      hero.png      the home page
      result.png    the result screen after a scripted round
      critique.png  the expanded critique list
+     mobile.png    home, case and result on a phone, side by side
 
    Usage:
      npm i --no-save playwright-core
@@ -59,6 +60,38 @@ I would rank the causes by effort and start with the channel comparison, then lo
   await page.screenshot({ path: path.join(OUT, 'critique.png'), fullPage: true, clip: { x: Math.max(0, box.x - 40), y: box.y - 10, width: Math.min(1440, box.width + 80), height: box.height + 50 } });
 
   const info = await page.evaluate(() => ({ score: document.querySelector('.ring .num b').textContent, weakest: document.querySelector('.wkt h2').textContent }));
-  console.log(`Wrote hero.png, result.png and critique.png to ${OUT} (score ${info.score}, weakest ${info.weakest}).`);
+
+  // Mobile: three phone-sized screens, composed into one image with simple frames.
+  const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })).newPage();
+  await phone.goto(URL, { waitUntil: 'networkidle' });
+  await phone.waitForSelector('#prows input');
+  await phone.waitForTimeout(2500);
+  const home = await phone.screenshot();
+  await phone.selectOption('#type', 'retention');
+  await phone.click('#go');
+  await phone.waitForSelector('#ans');
+  await phone.waitForTimeout(1500);
+  const caseShot = await phone.screenshot();
+  await phone.fill('#ans', ANSWER);
+  await phone.click('#submit');
+  await phone.waitForSelector('#drillw');
+  await phone.waitForTimeout(3500);
+  await phone.evaluate(() => { document.querySelectorAll('.confetti').forEach((e) => e.remove()); window.scrollTo(0, 0); });
+  const result = await phone.screenshot();
+
+  const uri = (b) => 'data:image/png;base64,' + b.toString('base64');
+  const figures = [['Home', home], ['Case', caseShot], ['Result', result]]
+    .map(([t, b]) => `<figure><div class="ph"><img src="${uri(b)}"></div><figcaption>${t}</figcaption></figure>`).join('');
+  const sheet = await (await browser.newContext({ viewport: { width: 1200, height: 800 }, deviceScaleFactor: 1.5 })).newPage();
+  await sheet.setContent(`<!doctype html><meta charset="utf-8"><style>
+    body{margin:0;background:#f1f3f6;font:500 15px/1.3 -apple-system,system-ui,sans-serif;color:#575b68}
+    .row{display:flex;justify-content:center;gap:56px;padding:56px 40px 44px}
+    figure{margin:0;text-align:center}
+    .ph{width:300px;border-radius:38px;border:9px solid #0d0e12;overflow:hidden;box-shadow:0 30px 60px -30px rgba(13,14,18,.45);background:#fff}
+    .ph img{display:block;width:100%}
+    figcaption{margin-top:18px}</style><div class="row">${figures}</div>`);
+  await sheet.screenshot({ path: path.join(OUT, 'mobile.png'), fullPage: true });
+
+  console.log(`Wrote hero.png, result.png, critique.png and mobile.png to ${OUT} (score ${info.score}, weakest ${info.weakest}).`);
   await browser.close();
 })().catch((e) => { console.error('Capture failed:', e.message); process.exit(1); });
