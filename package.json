@@ -1,13 +1,32 @@
 {
   "name": "pm-arena",
-  "private": true,
   "version": "1.0.0",
-  "description": "Practice PM interview cases on the clock. Heuristic critique, not a hiring assessment.",
+  "private": true,
+  "description": "Practice PM interview cases on the clock, by voice or text. Heuristic critique, not a hiring assessment.",
+  "keywords": [
+    "product-management",
+    "interview-prep",
+    "pm-interview",
+    "practice",
+    "scoring"
+  ],
+  "homepage": "https://pm-arena-phi.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/batool-fariha/pm-arena.git"
+  },
+  "bugs": {
+    "url": "https://github.com/batool-fariha/pm-arena/issues"
+  },
+  "author": "Fariha Batool (https://www.linkedin.com/in/fariha-batool/)",
   "license": "MIT",
-  "dependencies": {
-    "@vercel/blob": "^2.0.0"
+  "engines": {
+    "node": ">=18"
   },
   "scripts": {
     "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.0.0"
   }
 }

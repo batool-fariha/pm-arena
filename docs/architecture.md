@@ -33,6 +33,7 @@ Stored under the `pmarena.v1` key in `localStorage`:
 | `lastDay`, `streak`, `bestStreak`, `played` | Streak and counters |
 | `board` | Your top 50 scores on this device |
 | `history` | Your last 30 scored rounds: time, scores per dimension, weakest dimension, case, and your answer (up to 6000 characters) |
+| `drills` | Your last 50 drill results: time, dimension, score, case type (no answer text) |
 
 Clearing history on the home page empties `history`. Clearing site data removes everything.
 

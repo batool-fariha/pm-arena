@@ -41,7 +41,8 @@ See [docs/deploying.md](docs/deploying.md) to run the API too.
 
 - Keep each pull request focused.
 - Describe what changed and why, and say how you tested it (for example the answer you scored).
-- `npm test` must pass. CI runs it for you.
+- `npm test` must pass. CI runs it for you. It also checks that every link and heading anchor in the Markdown files resolves.
+- Add a line to the top of [CHANGELOG.md](CHANGELOG.md) for anything a user would notice, and update the docs that describe the behavior.
 - UI changes: check phone width and keyboard use, and respect `prefers-reduced-motion`.
 
 ## Reporting bugs
