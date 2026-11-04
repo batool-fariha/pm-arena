@@ -45,18 +45,16 @@ See [docs/deploying.md](docs/deploying.md) to run the API too.
 - Add a line to the top of [CHANGELOG.md](CHANGELOG.md) for anything a user would notice, and update the docs that describe the behavior.
 - UI changes: check phone width and keyboard use, and respect `prefers-reduced-motion`.
 
-## Updating the README screenshot
+## Updating the screenshots
 
-`docs/images/hero.png` is a capture of the live home page. Recapture it after a visual change, for example with a headless Chromium (Playwright's works):
+`docs/images/` holds three captures of the live site (`hero.png`, `result.png`, `critique.png`), used by the README and the user guide. Regenerate them after a visual change with the script, which plays a scripted round and never posts to the leaderboard:
 
 ```bash
-chrome-headless-shell --headless --hide-scrollbars --force-device-scale-factor=2 \
-  --window-size=1440,1400 --virtual-time-budget=9000 \
-  --screenshot=docs/images/hero.png https://pm-arena-phi.vercel.app/
-sips --resampleWidth 1800 docs/images/hero.png --out docs/images/hero.png   # macOS; keeps the file near 800 KB
+npm i --no-save playwright-core
+CHROME_PATH=/path/to/chromium-or-chrome-headless-shell node scripts/capture-screenshots.js
 ```
 
-Look at the result before committing: the whole scoring card and the ticker should be in frame.
+Playwright's own Chromium works (`npx playwright install chromium` downloads it). Set `URL` to capture a local or preview deployment instead of the live site. Look at the three files before committing: the whole scoring card and the ticker should be in frame, and the result should show a mid-range score with the biggest weakness expanded.
 
 ## Reporting bugs
 

@@ -47,6 +47,8 @@ Aim for 150 to 400 words in a 10-minute round. Under 30 words does not count at 
 - **Practise next** lists follow-up questions an interviewer could ask about your three weakest areas. Answer them out loud.
 - **AI coach notes** appear only if the site has them enabled. See [AI coach notes](#ai-coach-notes).
 
+![The full critique with the weakest dimension expanded, showing what the scorer found, what was missing, and a fix written for the case](images/critique.png)
+
 ## Drills
 
 A drill is a 3-minute round on one dimension.

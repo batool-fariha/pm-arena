@@ -5,7 +5,7 @@ All notable changes are listed here, newest first. The format follows [Keep a Ch
 ## 2026-11-05
 
 ### Added
-- Hero screenshot in the README, and instructions for refreshing it in CONTRIBUTING.
+- Hero and result screenshots in the README, a critique screenshot in the user guide, and `scripts/capture-screenshots.js` to regenerate them.
 
 ### Fixed
 - Phone layout: the hero sliders are full width with a 30px touch area and larger thumbs, instead of a 63px-wide strip.

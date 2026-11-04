@@ -41,6 +41,8 @@
 2. **Answer.** Section starters (Questions, Segments, Hypothesis, Metrics, Recommend) drop a scaffold into the answer box.
 3. **Review.** Open each dimension to see what was detected and missing, then work through the follow-up questions out loud.
 
+![The result screen: a score ring, the single biggest weakness with a drill button, and sharing options](docs/images/result.png)
+
 New to it? Read the [user guide](docs/user-guide.md).
 
 ## How scoring works
@@ -102,7 +104,8 @@ engine.js           case generator and scoring engine (runs in browser and Node)
 api/scores.js       shared leaderboard function
 api/grade.js        AI coach notes function
 test/               unit, calibration and documentation tests
-docs/               guides and reference
+docs/               guides, reference and screenshots
+scripts/            screenshot capture
 vercel.json         function settings
 ```
 
