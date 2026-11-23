@@ -195,7 +195,11 @@
         clarify: ['strategy', 'scale', 'goal', 'alternatives', 'legal', 'success'],
         title: `Build or buy ${cap}?`,
         prompt: `${ctx.name[0].toUpperCase() + ctx.name.slice(1)} needs ${cap}. Engineering estimates ${eng} engineers for ${months} months to build in-house. A vendor offers it for $${vendor}k per year with a 2-week integration. Make a recommendation.`,
-        facts: ['The roadmap is already full for two quarters.', 'The vendor is a 3-year-old startup.', 'Leadership wants a decision this week.'],
+        facts: pick([
+          ['The roadmap is already full for two quarters.', 'The vendor is a 3-year-old startup.', 'Leadership wants a decision this week.'],
+          ['The vendor would hold copies of customer data, and several enterprise customers forbid third-party processing.', 'Quotes for the vendor rise sharply above a usage tier the company expects to reach within a year.', 'The CTO built a prototype in-house last year and prefers building.'],
+          ['The only engineers who could build it are the same ones keeping the current system alive.', 'The vendor offers a 30-day pilot at no cost.', 'The security team must approve any new vendor, which usually takes six weeks.'],
+        ]),
         sample: {
           framing: 'State the decision and the criterion up front: "The question is whether ' + cap + ' is a source of advantage for us or a commodity we should rent."',
           segmentation: 'Segment the need: which users or use-cases depend on this most? A vendor may cover 80% of cases while the other 20% decide differentiation.',
@@ -213,7 +217,11 @@
         clarify: ['goal', 'user', 'alternatives', 'legal', 'success', 'scale'],
         title: `Launch in ${country}`,
         prompt: `Your company runs ${ctx.name} and is profitable in the US. The CEO wants to launch in ${country} within ${q} quarters. You have a cross-functional team of ${team}. How do you approach it, and would you go?`,
-        facts: ['There is no local entity or local hires yet.', 'About 3% of current users are already in that country.', 'A well-funded local competitor exists.'],
+        facts: pick([
+          ['There is no local entity or local hires yet.', 'About 3% of current users are already in that country.', 'A well-funded local competitor exists.'],
+          ['Local law requires user data to be stored in the country, which means a new hosting setup.', 'Only about 20% of adults there have a payment card; most pay by bank transfer or cash.', 'The regional sales lead has already told a partner the launch date.'],
+          ['App store approval needs a local publisher account that the company does not have.', 'Support must be in the local language from day one, and nobody on the team speaks it.', 'The CFO has capped spending at what the company would lose in one quarter.'],
+        ]),
         sample: {
           framing: 'Name the decision (go / no-go / pilot) and the 2-3 things that would have to be true for "go".',
           segmentation: 'Pick a beachhead: one city, user type or channel to start in, and say why. "All of ' + country + '" is not a segment.',
@@ -251,7 +259,11 @@
         clarify: ['goal', 'success', 'user', 'scale', 'baseline'],
         title: 'Define success metrics',
         prompt: `${ctx.name[0].toUpperCase() + ctx.name.slice(1)} is launching ${feat}. Define how you would measure whether it is a success, and what you would watch out for.`,
-        facts: ['It ships to 10% of users first.', 'No baseline data exists for this behavior yet.', 'Leadership wants a go/no-go on full rollout after 4 weeks.'],
+        facts: pick([
+          ['It ships to 10% of users first.', 'No baseline data exists for this behavior yet.', 'Leadership wants a go/no-go on full rollout after 4 weeks.'],
+          ['Only about 2% of users are expected to use it in any week, so small differences are hard to detect.', 'The feature could pull usage away from an existing screen that earns revenue.', 'The growth team will be judged on sign-ups, not on this feature.'],
+          ['Analytics events for it will only be reliable after the next app release in three weeks.', 'Heavy users make up a small share of accounts but most of the activity.', 'Legal must approve any metric that uses message content.'],
+        ]),
         sample: {
           framing: 'Start from the user and business goal the feature serves, then say what decision the metrics must support (full rollout, iterate, or stop).',
           segmentation: 'Say which users you would read the metric for: new vs existing, heavy vs light, and the 10% exposed group vs the control group.',
