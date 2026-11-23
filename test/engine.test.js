@@ -114,3 +114,24 @@ test('every dimension has a drill with a complete checklist', () => {
 test('hypothesis drill hints exist for every case type', () => {
   for (const t of A.TYPES) assert.ok(A.driverLabels(A.generateCase(t.id)).length >= 5, t.id);
 });
+
+const STRONG_BVB = 'What is the goal, and how strategic is this capability? The decision is whether it is a source of advantage or a commodity we should rent. First I would check scale, the total cost of ownership over three years, and lock-in and exit options. I believe a staged path is right: buy now to ship faster, then revisit building at a defined trigger, because speed matters more than control today. I would validate with a pilot and a security review. Metrics: time to live and the business KPI it moves, with a guardrail on latency and quality versus today. I would rank by impact and effort, and say what flips the recommendation. Next steps this week: vendor shortlist and a pilot plan.';
+const STRONG_METRICS = 'What is the goal and who is the target user? The decision is full rollout, iterate or stop. First I would define one primary metric, two input metrics and two guardrails, with a baseline from existing behavior and a target lift. I believe the feature raises engagement because it removes a step, so I would validate with an A/B test using a holdout control group, a sample size from the minimum detectable effect, and a four week duration. Guardrails: cannibalization of existing revenue screens and support contacts must not get worse. I would rank metrics by impact and set the threshold that triggers go, iterate or stop. Next steps this week: instrument the events and size the experiment.';
+
+test('launch, build-vs-buy and metrics cases vary their facts, and a reasonable answer scores well on every variant', () => {
+  const answers = { launch: STRONG_LAUNCH, buildvsbuy: STRONG_BVB, metrics: STRONG_METRICS };
+  for (const [type, strong] of Object.entries(answers)) {
+    const variants = new Set();
+    for (let i = 0; i < 200; i++) {
+      const c = A.generateCase(type);
+      assert.equal(c.facts.length, 3, `${type} has exactly 3 facts`);
+      assert.equal(new Set(c.facts).size, 3, `${type} facts are distinct`);
+      variants.add(c.facts.join('|'));
+      const s = A.scoreAnswer(strong, c).overall;
+      const w = A.scoreAnswer(WEAK, c).overall;
+      assert.ok(s >= 55, `${type}: strong answer scored ${s}`);
+      assert.ok(s - w >= 25, `${type}: strong ${s} vs weak ${w}`);
+    }
+    assert.equal(variants.size, 3, `${type} should have three fact sets`);
+  }
+});
