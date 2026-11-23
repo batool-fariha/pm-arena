@@ -38,6 +38,20 @@ test('a structured on-topic answer beats a vague one by a wide margin', () => {
   assert.equal(better, 20);
 });
 
+const STRONG_PRICING = 'What is the goal, and who are the customers on this plan? The decision is whether the extra revenue per customer outweighs the customers we lose. First I would segment customers by tenure, usage and annual versus monthly, because willingness to pay and churn risk differ between them. I believe the plan is worth more than today because competitors charge more, so I would validate with a price test on new customers and a survey of existing ones. Metrics: net revenue per customer, with a baseline from current churn and a break-even on churn, and guardrails on downgrades and support contacts. I would rank by revenue impact and effort, and defer a broad change. Roll out in stages, grandfather annual customers, give notice, and name the result that would make us roll back. Next steps this week: pull churn by segment and design the test.';
+
+test('a pricing answer that covers the drivers beats a vague one and drops without them', () => {
+  for (let i = 0; i < 20; i++) {
+    const c = A.generateCase('pricing');
+    assert.equal(c.type, 'pricing');
+    assert.match(c.prompt, /raising the .+ plan from \$\d+ to \$\d+/);
+    assert.ok(A.driverLabels(c).includes('willingness to pay'));
+    const strong = A.scoreAnswer(STRONG_PRICING, c).overall;
+    const weak = A.scoreAnswer(WEAK, c).overall;
+    assert.ok(strong - weak >= 25, `strong ${strong} vs weak ${weak}`);
+  }
+});
+
 test('short answers are capped and do not count', () => {
   const r = A.scoreAnswer('First I would ask what the goal is and who the user is?', A.generateCase('retention'));
   assert.equal(r.counts, false);

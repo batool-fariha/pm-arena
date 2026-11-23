@@ -96,6 +96,7 @@ The "breadth of causes" signal uses the categories for the case type.
 | Prioritize five features | impact, effort, confidence, reach, strategic fit, dependencies, learning and risk |
 | Design for a user | pain points, jobs, journey, MVP, constraints, alternatives, validation |
 | Define success metrics | primary metric, input metrics, guardrails, baseline and target, experiment design, instrumentation, side effects |
+| Pricing change | willingness to pay, customer segments, churn and downgrade risk, competitor and price anchors, packaging and grandfathering, price test design, revenue and unit economics |
 
 ## Guards
 
