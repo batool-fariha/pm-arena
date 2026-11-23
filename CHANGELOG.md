@@ -4,7 +4,8 @@ All notable changes are listed here, newest first. The format follows [Keep a Ch
 
 ## Unreleased
 
-Nothing yet.
+### Added
+- A pricing case type ("Raise the Pro price?") with its own drivers: willingness to pay, segments, churn risk, competitor anchors, grandfathering and rollout, price test design, and revenue and unit economics.
 
 ## [1.0.0] - 2026-11-05
 

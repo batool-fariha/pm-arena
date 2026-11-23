@@ -27,7 +27,7 @@
 
 ## Features
 
-- **Seven case types:** retention drop, conversion fall, build vs buy, new market launch, prioritize five features, design for a specific user, and define success metrics. Cases are generated with random parameters, so rounds differ.
+- **Eight case types:** retention drop, conversion fall, build vs buy, new market launch, prioritize five features, design for a specific user, define success metrics, and pricing change. Cases are generated with random parameters, so rounds differ.
 - **Timed rounds:** 5, 10 or 15 minutes, typed or dictated. When time runs out, what you have is submitted.
 - **A critique that points at one thing:** seven scores, what was found and missed in each, a fix written for that case, and the biggest weakness.
 - **Follow-up questions** an interviewer could ask about your three weakest areas.

@@ -22,6 +22,7 @@ PM Arena is practice for product management case interviews. You get a case, ans
 | Prioritize 5 features | Rank five features against a capacity limit and say what to cut |
 | Design for a user | Design a first product for a specific kind of person |
 | Define success metrics | Say how you would measure whether a launch worked |
+| Pricing change | Decide whether to raise a plan's price and how to roll it out |
 
 Cases are generated with random companies, numbers, countries and features, so repeating a type still gives you a new case.
 

@@ -85,6 +85,15 @@
       { label: 'instrumentation / data quality', re: /(instrument|event|tracking|logging|data quality|attribution)/ },
       { label: 'side effects / cannibalization', re: /(cannibal|novelty|side effect|unintended|gaming|vanity)/ },
     ],
+    price: [
+      { label: 'willingness to pay', re: /(willingness to pay|\bwtp\b|price (sensitiv|elastic)|elasticity|van westendorp|conjoint|survey|perceived value)/ },
+      { label: 'customer segments', re: /(segment|tier|\bsmb\b|enterprise|power users?|casual|heavy users?|light users?|cohort|persona)/ },
+      { label: 'churn and downgrade risk', re: /(churn|downgrade|cancel|retention|attrition|switch(ing)? away)/ },
+      { label: 'competitor and price anchors', re: /(competitor|anchor|benchmark|market price|alternative|substitute|incumbent)/ },
+      { label: 'packaging, grandfathering and rollout', re: /(grandfather|legacy (plan|price)|package|packaging|bundle|annual (plan|discount)|phase[ds]? (in|rollout)|notice period|communicat)/ },
+      { label: 'price test design', re: /(a\/b|price test|holdout|control group|experiment|new customers? only|sample size|duration)/ },
+      { label: 'revenue and unit economics', re: /(revenue|arpu|\bltv\b|margin|payback|cost to serve|net revenue retention|\bnrr\b|break-?even)/ },
+    ],
     design: [
       { label: 'pain points', re: /(pain|problem|friction|struggle|frustrat|unmet need)/ },
       { label: 'jobs / motivations', re: /(job to be done|jtbd|\bneeds?\b|motivation|trying to get done)/ },
@@ -121,6 +130,7 @@
     { id: 'prioritize', label: 'Prioritize 5 features' },
     { id: 'design', label: 'Design for a user' },
     { id: 'metrics', label: 'Define success metrics' },
+    { id: 'pricing', label: 'Pricing change' },
   ];
 
   const GEN = {
@@ -251,6 +261,34 @@
         },
       };
     },
+    pricing() {
+      const ctx = pick(CONTEXTS), plan = pick(['Pro', 'Plus', 'Team', 'Premium']);
+      const from = pick([10, 15, 20, 25, 30, 40]), to = from + pick([2, 3, 4, 5, 6, 8]);
+      const pct = Math.round(100 * (to - from) / from), breakEven = Math.round(100 * pct / (100 + pct));
+      const facts = shuffle([
+        `The ${plan} plan has not changed price in ${int(2, 4)} years.`,
+        'Two direct competitors charge about 20% more for a similar plan.',
+        `Monthly churn on ${plan} is ${int(2, 5)}%, and it is higher in the first 90 days.`,
+        'Annual subscribers are about a third of paying customers.',
+        'Support costs per customer have risen since the last two feature launches.',
+        'A small group of heavy users generates most of the usage cost.',
+        'Customers have never been surveyed about price.',
+      ]).slice(0, 3);
+      return {
+        type: 'pricing', diagnostic: false, drivers: 'price',
+        clarify: ['goal', 'user', 'alternatives', 'scale', 'baseline', 'success'],
+        title: `Raise the ${plan} price?`,
+        prompt: `${ctx.name[0].toUpperCase() + ctx.name.slice(1)} is considering raising the ${plan} plan from $${from} to $${to} per month (+${pct}%). Should it, and how would you decide and roll it out?`,
+        facts,
+        sample: {
+          framing: 'State the decision and the test first: "Raise only if the extra revenue per customer outweighs the customers we lose, and the plan is worth the new price to the segments that matter."',
+          segmentation: 'Split customers by plan, usage and tenure (new, annual, long-standing, heavy users). Willingness to pay and churn risk differ a lot between them, so the right answer may be a different change per segment.',
+          hypothesis: 'e.g. "We believe ' + plan + ' customers value it above $' + to + ' because competitors charge more. That holds only if fewer than about ' + breakEven + '% of customers leave. I would check with a price test on new customers and a survey of existing ones."',
+          metrics: 'Primary: net revenue per customer after the change. Break-even: a +' + pct + '% price pays off unless more than about ' + breakEven + '% of revenue churns. Guardrails: churn, downgrades and support contacts. Leading: conversion for new customers at the new price.',
+          prioritization: 'Recommend a staged rollout: test on new customers first, grandfather existing annual customers, give notice before changing monthly ones, and name the result that would make you stop or roll back.',
+        },
+      };
+    },
     design() {
       const persona = pick(['night-shift nurses trying to protect their sleep', 'first-time home buyers', 'freelancers chasing late invoices', 'smallholder farmers selling produce', 'visually impaired daily commuters', 'new parents managing childcare logistics', 'gig delivery riders on long shifts', 'small cafe owners managing inventory', 'students preparing for exams', 'caregivers of elderly parents']);
       const n = int(4, 8), m = int(3, 6);
@@ -281,6 +319,7 @@
       prioritize: (c.list || []).map((f) => tok(f.name)).filter(Boolean).join('|') + '|engineering-weeks|capacity|roadmap',
       design: tok(c.prompt.split('. ')[0].replace('Design a product for ', '')),
       metrics: 'metric|measure|a\\/b|holdout|guardrail|north star|rollout|control group',
+      pricing: 'pric|willingness to pay|churn|elasticity|grandfather|tier|discount|revenue|downgrade',
     }[id];
   }
 
