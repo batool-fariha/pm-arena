@@ -24,7 +24,7 @@ PM Arena is practice for product management case interviews. You get a case, ans
 | Define success metrics | Say how you would measure whether a launch worked |
 | Pricing change | Decide whether to raise a plan's price and how to roll it out |
 
-Cases are generated with random companies, numbers, countries and features, so repeating a type still gives you a new case.
+Cases are generated with random companies, numbers, countries and features, so repeating a type still gives you a new case. New market launch, build vs buy and define success metrics also rotate between three sets of background facts, so the constraints you are given differ from round to round. Read the "What you know" list before you answer: the facts are there to change the right answer, though they are not scored.
 
 ## Writing an answer that scores well for the right reasons
 
