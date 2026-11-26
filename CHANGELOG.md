@@ -5,6 +5,7 @@ All notable changes are listed here, newest first. The format follows [Keep a Ch
 ## Unreleased
 
 ### Added
+- A second retention case, "Week-1 retention dropped overnight": a one-day step-change that lines up with an analytics SDK upgrade, with flat revenue and support. The right first move is to check the data is real, not to diagnose user behavior. Retention rounds now pick between the two cases.
 - A pricing case type ("Raise the Pro price?") with its own drivers: willingness to pay, segments, churn risk, competitor anchors, grandfathering and rollout, price test design, and revenue and unit economics.
 - Two more sets of facts for each of the new market launch, build vs buy and define success metrics cases (three each, up from one), so repeat rounds of those types no longer show the same facts. Each set has a constraint, a number and a stakeholder that change the right answer.
 

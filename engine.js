@@ -135,6 +135,30 @@
 
   const GEN = {
     retention() {
+      return Math.random() < 0.5 ? GEN.retentionOvernight() : GEN.retentionSlide();
+    },
+    retentionOvernight() {
+      const ctx = pick(CONTEXTS), from = int(24, 36), drop = int(6, 12), day = pick(['Tuesday', 'Wednesday', 'Thursday']);
+      return {
+        type: 'retention', diagnostic: true, drivers: 'diag', variant: 'overnight',
+        clarify: ['timing', 'scope', 'definition', 'changes', 'baseline', 'goal'],
+        title: 'Week-1 retention dropped overnight',
+        prompt: `Week-1 retention for ${ctx.name} fell from ${from}% to ${from - drop}% in a single day, last ${day}, and has stayed there since. The CEO saw it on the dashboard and wants to know what broke.`,
+        facts: shuffle([
+          'The same release that went out that morning upgraded the analytics SDK.',
+          'Revenue, support tickets and app-store ratings have not moved.',
+          'The drop is the same size on every platform and in every country.',
+        ]),
+        sample: {
+          framing: 'Open with: "A step-change this big, on one day, across every segment, looks like a measurement change before it looks like a behavior change. First I confirm the drop is real."',
+          segmentation: 'Cut it by app version (old SDK vs new SDK on the same day), platform and event type. If only users on the new release dropped, it is the release; if users on the old release dropped too, look elsewhere.',
+          hypothesis: 'e.g. "I believe the SDK upgrade changed how a returning session is counted, because revenue and support are flat and the drop is uniform. I would test it by comparing raw session logs with the dashboard for the same users."',
+          metrics: 'Primary: week-1 retention rebuilt from raw server logs (baseline ' + from + '%). Cross-checks: revenue, orders and server-side active users, which do not depend on the SDK. Leading: sessions per user on old vs new app versions.',
+          prioritization: 'Check the cheapest explanation first (the tracking change), tell the CEO what you will know by when, and only open a product investigation if the server-side numbers also dropped.',
+        },
+      };
+    },
+    retentionSlide() {
       const ctx = pick(CONTEXTS), from = int(38, 52), drop = int(5, 11), weeks = int(3, 6);
       const facts = shuffle([
         `New-user volume is up ${int(10, 35)}% since a paid campaign began.`,
