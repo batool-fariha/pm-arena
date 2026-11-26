@@ -574,6 +574,39 @@
     const extra = diagnostic ? 'Say how you would check the data is real before diagnosing' : 'Name the options you would compare';
     return { focus: d.focus, checklist: d.checklist.map((x) => (x === null ? extra : x)) };
   }
+  /* Adaptive practice: lean the next random case towards the dimension the
+     user keeps scoring lowest, and back off once it improves. Pure function
+     of the stored round history, so it is easy to test. */
+  const ADAPT = { minRounds: 3, window: 5, target: 70, lean: 2 / 3 };
+  const DIM_TYPES = {
+    framing: ['buildvsbuy', 'pricing', 'launch'],
+    clarify: ['retention', 'conversion', 'launch'],
+    segmentation: ['retention', 'conversion', 'launch', 'pricing'],
+    hypothesis: ['retention', 'conversion'],
+    metrics: ['metrics', 'pricing'],
+    prioritization: ['prioritize', 'buildvsbuy'],
+    communication: TYPES.map((t) => t.id),
+  };
+  function adaptiveFocus(history) {
+    const h = (Array.isArray(history) ? history : []).filter((e) => e && e.dims).slice(-ADAPT.window);
+    if (h.length < ADAPT.minRounds) return null;
+    const avgs = DIMS.map((d) => {
+      const xs = h.map((e) => e.dims[d.id]).filter((x) => typeof x === 'number');
+      return { d, avg: xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length) : 100, last: xs.slice(-2) };
+    }).sort((a, b) => b.d.weight * (100 - b.avg) - a.d.weight * (100 - a.avg));
+    const w = avgs[0];
+    if (w.avg >= ADAPT.target) return null;
+    if (w.last.length === 2 && w.last.every((x) => x >= ADAPT.target)) return null;
+    return { dim: w.d.id, name: w.d.name, avg: w.avg, rounds: h.length, target: ADAPT.target, types: DIM_TYPES[w.d.id] };
+  }
+  function adaptiveCase(history, rand) {
+    const r = typeof rand === 'function' ? rand : Math.random;
+    const f = adaptiveFocus(history);
+    if (!f || r() >= ADAPT.lean) return { c: generateCase(), focus: null };
+    const c = generateCase(f.types[Math.floor(r() * f.types.length)]);
+    return { c, focus: f };
+  }
+
   function driverLabels(c) { return (DRIVERS[c.drivers] || []).map((x) => x.label); }
 
   function band(n) {
@@ -584,7 +617,7 @@
     return 'Early draft';
   }
 
-  const api = { TYPES, CLARIFY, generateCase, scoreAnswer, band, DIMS, rebuildCase, followUps, drillInfo, driverLabels };
+  const api = { TYPES, CLARIFY, generateCase, scoreAnswer, band, DIMS, rebuildCase, followUps, drillInfo, driverLabels, adaptiveFocus, adaptiveCase, ADAPT };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Arena = api;
 })(typeof window !== 'undefined' ? window : globalThis);

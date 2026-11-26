@@ -338,6 +338,7 @@ button.tlink{background:none;border:0;cursor:pointer}
 .hintbox ul{margin:6px 0 0;padding-left:1.2rem}
 /* shared board */
 .note2{color:var(--mute);font-size:.9rem;margin-top:6px}
+.focusnote{margin-top:10px}.focusnote i{color:var(--accent);vertical-align:-2px}
 /* progress + coach */
 .sparkbox{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px}
 .spark{width:100%;height:auto;display:block;overflow:visible}
@@ -619,7 +620,7 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
     document.getElementById('go').onclick = () => {
       store.nick = document.getElementById('nick').value.trim().slice(0, 20);
       store.type = document.getElementById('type').value; save();
-      start(A.generateCase(store.type));
+      startNext();
     };
     const da = document.getElementById('drillavg'); if (da) da.onclick = () => startDrill(da.dataset.dim);
     const ch = document.getElementById('clearhist'); if (ch) ch.onclick = () => { if (confirm('Clear your round history on this device?')) { store.history = []; save(); home(); } };
@@ -729,16 +730,26 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
   }
 
   /* ---------- case ---------- */
+  /* With "random case" chosen, lean towards the weakest dimension (see engine.js adaptiveCase). */
+  function nextCase() {
+    if (store.type) return { c: A.generateCase(store.type), focus: null };
+    return A.adaptiveCase(store.history || []);
+  }
+  function startNext() { const n = nextCase(); start(n.c, { focus: n.focus }); }
+  function focusNote(f) {
+    if (!f) return '';
+    return `<p class="note2 focusnote"><i class="ph ph-target"></i> Picked to practise <b>${esc(f.name.toLowerCase())}</b>: it averaged ${f.avg} over your last ${f.rounds} rounds. Cases stop leaning this way once it reaches ${f.target}.</p>`;
+  }
   function start(c, opts) {
     stopMic();
-    state.c = c; state.answer = ''; state.drill = opts && opts.drill ? opts.drill : null;
+    state.c = c; state.answer = ''; state.drill = opts && opts.drill ? opts.drill : null; state.focus = opts && opts.focus ? opts.focus : null;
     state.limitMs = state.drill ? 3 * 60000 : store.limit * 60000; state.end = Date.now() + state.limitMs;
     const list = c.list ? `<ul>${c.list.map(f => `<li><b style="color:var(--ink)">${esc(f.name)}</b>, about ${f.effort} eng-weeks, in ${f.ask}% of feedback</li>`).join('')}</ul>` : '';
     nav();
     $app.innerHTML = `<div class="prog" id="fill"></div>
       <div class="bar"><div class="wrap"><span class="pill">${esc(c.label)}</span><span class="clock" id="clock" role="timer"></span></div></div>
       <div class="wrap"><div class="case">
-        <aside class="brief rise">${drillPanel(c)}<span class="chip">${esc(c.label)}</span><h2>${esc(c.title)}</h2>
+        <aside class="brief rise">${drillPanel(c)}<span class="chip">${esc(c.label)}</span><h2>${esc(c.title)}</h2>${focusNote(state.focus)}
           <p class="prompt">${esc(c.prompt)}</p>${list}
           <p class="sub">What you know</p><ul>${c.facts.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
           <p class="note">Some facts may be red herrings. Ask what you would need to know before answering.</p></aside>
@@ -862,8 +873,8 @@ Recommendation and next steps: analytics runs the cohort cuts in two days, with 
         }
       } catch (e) { pb.disabled = false; pm.textContent = 'Could not reach the server. Check your connection and try again.'; }
     };
-    document.getElementById('next').onclick = () => start(A.generateCase(store.type));
-    document.getElementById('retry').onclick = () => start(state.c);
+    document.getElementById('next').onclick = () => startNext();
+    document.getElementById('retry').onclick = () => start(state.c, { focus: state.focus });
     document.getElementById('drillw').onclick = () => startDrill(w.id);
     initCoach(); wireBoard(); countUp(); window.scrollTo(0, 0); if (r.overall >= 75) burst(); state.bump = false;
   }

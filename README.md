@@ -40,6 +40,8 @@
 
 **Drill mode** turns a weakness into practice: a 3-minute round on one dimension, with a checklist of exactly what the scorer looks for.
 
+**Adaptive practice** leans random cases towards your weakest dimension once you have a few rounds of history, and says why it picked each one. See [Practising your weakest area](docs/user-guide.md#practising-your-weakest-area).
+
 ![A drill in progress: the Metrics checklist at the top left, the case below it, and a drafted answer with a countdown on the right](docs/images/drill.png)
 
 ## How a round works
@@ -140,7 +142,7 @@ The suite covers the scoring engine, a calibration suite that catches drift in t
 
 ## Status and roadmap
 
-Actively maintained as a personal project. Ideas, not promises: more case types, spaced repetition of your weakest dimension, and a sign-in so the AI coach can be limited per person instead of per device.
+Actively maintained as a personal project. Ideas, not promises: more case types and a sign-in so the AI coach can be limited per person instead of per device.
 
 ## License
 

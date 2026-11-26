@@ -77,6 +77,19 @@ Press **Dictate**, allow the microphone when asked, and speak. Your words appear
 
 After a scored round, the home page shows your score trend, your average per dimension with the weakest flagged, your drill count, and your recent rounds with the answers you wrote. This is stored only in your browser. **Clear history** removes it. Clearing the site's data in your browser removes everything, including your streak.
 
+## Practising your weakest area
+
+When you leave the case type on **Random case**, the next case leans towards the dimension you keep scoring lowest:
+
+- It starts after 3 scored rounds and looks at your last 5.
+- The weakest dimension is the one with the largest weighted shortfall, the same rule as **Biggest weakness** on a result.
+- Two rounds in three pick a case type that tests that dimension well (for example, Prioritize five features for prioritization, or a retention or conversion case for clarifying questions). The third round is fully random, so you still see everything.
+- The case shows a note saying why it was picked.
+- It backs off when that dimension averages 70 or more, or your last two rounds on it both scored 70 or more.
+- Choosing a specific case type turns it off. Drills don't change it, because they aren't part of your history.
+
+Everything uses the history stored on your device. Nothing is sent anywhere.
+
 ## Streaks and leaderboards
 
 - **Daily streak:** a day counts when you finish a scored round or drill. Miss a day and it resets.
