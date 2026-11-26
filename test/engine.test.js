@@ -156,3 +156,38 @@ test('the overnight retention case appears, rebuilds, and rewards checking the d
   }
   assert.equal(seen, 10);
 });
+
+const round =(scores) => ({ dims: Object.fromEntries(A.DIMS.map((d) => [d.id, scores[d.id] ?? 85])) });
+
+test('adaptive practice waits for enough rounds', () => {
+  assert.equal(A.adaptiveFocus([]), null);
+  assert.equal(A.adaptiveFocus([round({ segmentation: 20 }), round({ segmentation: 20 })]), null);
+});
+
+test('adaptive practice targets the dimension with the largest weighted shortfall', () => {
+  const h = [round({ segmentation: 30, clarify: 40 }), round({ segmentation: 40, clarify: 40 }), round({ segmentation: 35, clarify: 40 })];
+  const f = A.adaptiveFocus(h);
+  assert.equal(f.dim, 'segmentation');
+  assert.equal(f.avg, 35);
+  assert.equal(f.rounds, 3);
+  assert.ok(f.types.length > 0);
+});
+
+test('adaptive practice backs off once the weak dimension improves', () => {
+  assert.equal(A.adaptiveFocus([round({}), round({}), round({})]), null, 'nothing below target');
+  const recovering = [round({ metrics: 20 }), round({ metrics: 20 }), round({ metrics: 30 }), round({ metrics: 75 }), round({ metrics: 80 })];
+  assert.equal(A.adaptiveFocus(recovering), null, 'last two rounds at or above target');
+});
+
+test('adaptive cases lean towards matching types about two rounds in three', () => {
+  const h = [round({ prioritization: 20 }), round({ prioritization: 25 }), round({ prioritization: 30 })];
+  let leaned = 0;
+  for (let i = 0; i < 600; i++) {
+    const { c, focus } = A.adaptiveCase(h);
+    assert.ok(c && c.type);
+    if (focus) { leaned++; assert.ok(['prioritize', 'buildvsbuy'].includes(c.type), c.type); }
+  }
+  assert.ok(leaned > 330 && leaned < 470, `leaned ${leaned}/600`);
+  const off = A.adaptiveCase([round({}), round({}), round({})], () => 0);
+  assert.equal(off.focus, null);
+});

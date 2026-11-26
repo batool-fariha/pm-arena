@@ -6,6 +6,7 @@ All notable changes are listed here, newest first. The format follows [Keep a Ch
 
 ### Added
 - A second retention case, "Week-1 retention dropped overnight": a one-day step-change that lines up with an analytics SDK upgrade, with flat revenue and support. The right first move is to check the data is real, not to diagnose user behavior. Retention rounds now pick between the two cases.
+- Practice that adapts to your weakest dimension. With **Random case** chosen and at least 3 scored rounds, two rounds in three pick a case type that tests the dimension you score lowest over your last 5 rounds, with a note saying why. It backs off at an average of 70, or after two rounds in a row at 70 or more. Runs on the device from your stored history. See [the user guide](docs/user-guide.md#practising-your-weakest-area).
 - A pricing case type ("Raise the Pro price?") with its own drivers: willingness to pay, segments, churn risk, competitor anchors, grandfathering and rollout, price test design, and revenue and unit economics.
 - Two more sets of facts for each of the new market launch, build vs buy and define success metrics cases (three each, up from one), so repeat rounds of those types no longer show the same facts. Each set has a constraint, a number and a stakeholder that change the right answer.
 
