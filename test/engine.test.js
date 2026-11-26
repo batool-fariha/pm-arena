@@ -135,3 +135,24 @@ test('launch, build-vs-buy and metrics cases vary their facts, and a reasonable 
     assert.equal(variants.size, 3, `${type} should have three fact sets`);
   }
 });
+
+const OVERNIGHT_ANSWER = 'When exactly did it start, and did the definition or tracking change? Is it on all platforms? The goal is to find out whether the drop is real before we fix anything. First I would check the data: a step-change this big on one day looks like a measurement problem. I would segment retention by app version, platform and country, and start with old versus new release users. I believe the analytics SDK upgrade changed how returning sessions are counted, because revenue and support are flat. I would test it by comparing raw server logs with the dashboard. Metrics: week-1 retention rebuilt from server logs against the baseline, with revenue as a guardrail. I would rank checks by cost and likelihood and check tracking first. Next steps today: pull server-side retention and tell the CEO by tomorrow.';
+
+test('the overnight retention case appears, rebuilds, and rewards checking the data first', () => {
+  let seen = 0;
+  for (let i = 0; i < 200 && seen < 10; i++) {
+    const c = A.generateCase('retention');
+    if (c.variant !== 'overnight') continue;
+    seen++;
+    assert.equal(c.facts.length, 3);
+    assert.match(c.prompt, /in a single day/);
+    const r = A.rebuildCase({ type: c.type, title: c.title, prompt: c.prompt });
+    assert.equal(r.topic, c.topic);
+    const strong = A.scoreAnswer(OVERNIGHT_ANSWER, c).overall;
+    const weak = A.scoreAnswer(WEAK, c).overall;
+    assert.ok(strong >= 60 && strong <= 100, `strong ${strong}`);
+    assert.ok(strong - weak >= 25, `strong ${strong} vs weak ${weak}`);
+    assert.equal(A.scoreAnswer(OVERNIGHT_ANSWER, r).overall, strong, 'server re-score matches');
+  }
+  assert.equal(seen, 10);
+});

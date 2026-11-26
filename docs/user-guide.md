@@ -15,7 +15,7 @@ PM Arena is practice for product management case interviews. You get a case, ans
 
 | Type | You are asked to |
 |---|---|
-| Retention drop | Diagnose a fall in retention and propose a plan |
+| Retention drop | Diagnose a fall in retention and propose a plan (either a slow slide over weeks, or an overnight drop) |
 | Conversion fall | Diagnose a fall in free-to-paid conversion |
 | Build vs buy | Recommend building or buying a capability |
 | New market launch | Decide how and whether to launch in a country |
